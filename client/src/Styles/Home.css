@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap');
+
+.content{
+    height: auto;
+  }
+.slide img{
+  width: auto;
+  margin: auto;
+  display: flex;
+}
+  .Headernav{
+    border-bottom: #AB8310 solid 3.5px;
+    border-radius: auto;
+  }
+
+  li{
+    display: block;
+  }
+
+    ul.logo{
+      float: left;
+      padding: 15px;
+      margin-left: 15px;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+
+    li.h1 {
+      margin-top: 29px;
+      font-size: 20px;
+      color: #AB8310;
+      font-family: 'Rubik', sans-serif;
+    }
+    li.h2 {
+      font-size: 20px;
+      color: #424753;
+      margin-bottom: 5px;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    .mslogin{
+      margin-left: auto;
+      padding: 10px;
+      margin-top: 5px;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+
+  .SubContent{
+    padding: 10px;
+    margin: 20px;
+    height: 150px;
+    width: 150px;
+    display: flex;
+  }
+
+    .SubContent img {
+      padding: 15px;
+      margin: 15px;
+      height: 300px;
+      width: 350px;
+    }
+    .ContentText{
+      padding: 20px;
+      margin: 20px;
+      height: auto;
+      width: 300px;
+    }
+    .ContentText h2{
+      font-family: 'Rubik', sans-serif;
+      font-size: 23px;
+      text-align:justify;
+      width: 300px;
+      margin: 5px;
+      padding: 0px;
+    }
+    .ContentText h3{
+      font-family: 'Rubik', sans-serif;
+      font-size: 15px;
+      font-weight: normal;
+      text-align:justify;
+      width: 300px;
+      margin: 6px;
+      padding: 0px;
+    }
+    .ContentText p{
+      font-family: 'Rubik', sans-serif;
+      font-size: 15px;
+      font-weight: lighter;
+      text-align:justify;
+      width: 400px;
+      margin: 7px;
+      padding: 0px;
+    }
+
+  .Contact{
+    background-color: #032F77;
+    width: auto;
+    padding: 15px;
+      margin-top:200px;
+      margin-right: 5px;
+      margin-bottom: 5px;
+  }
+
+    .Contact img{
+      float: left;
+      padding: 15px;
+      margin-left: 40px;
+      margin-right: 5px;
+      margin-bottom: 5px;
+      width:150px;
+      height:auto;
+      
+    }
+
+    .Contact h2{
+      font-family: 'Rubik', sans-serif;
+      font-size: 30px;
+      color:#FFFFFF;
+      width: auto;
+      margin: 5px;
+      padding: 0px;
+    }
+    .Contact h3{
+      font-family: 'Rubik', sans-serif;
+      font-size: 15px;
+      color:#FFFFFF;
+      font-weight: normal;
+      text-align:justify;
+      margin: 6px;
+      padding: 0px;
+    }
+    .Contact p{
+      font-family: 'Rubik', sans-serif;
+      font-size: 15px;
+      color:#FFFFFF;
+      font-weight: lighter;
+      text-align:justify;
+      margin: 7px;
+      padding: 0px;
+    }
+
+.ft{
+      font-family: 'Rubik', sans-serif;
+      text-align: center;
+      margin: auto;
+      padding: 5px;
+    }
