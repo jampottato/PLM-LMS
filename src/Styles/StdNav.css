@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap');
+
+.FunctionNav{
+    margin-left: 220px;
+    padding: 10px;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
+
+.home{
+    margin: 10px;
+    font-family: 'Rubik', 'sans-serif';
+    color: black;
+    text-decoration: none;
+    padding: 15px;
+    font-size: 20px;
+}
+    .home:hover{
+        color: #AB8310;
+    }
+  
+.appointment{
+    margin: 10px;
+    font-family: 'Rubik', 'sans-serif';
+    color: black;
+    text-decoration: none;
+    padding: 15px;
+    font-size: 20px;
+    
+}
+    .appointment:hover{
+        color: #AB8310;
+    }
+  
+.resources{
+    margin: 10px;
+    font-family: 'Rubik', 'sans-serif';
+    color: black;
+    text-decoration: none;
+    padding: 15px;
+    font-size: 20px;
+}
+    .resources:hover{
+        color: #AB8310;
+    }
+
+.tutorial{
+    margin: 10px;
+    font-family: 'Rubik', 'sans-serif';
+    color: black;
+    text-decoration: none;
+    padding: 15px;
+    font-size: 20px;
+}
+
+    .tutorial:hover{
+        color: #AB8310;
+    }
+
+.footer{
+        font-family: 'Rubik', sans-serif;
+        text-align: center;
+        margin: auto;
+        padding: 5px;
+        border-top: #AB8310 solid 3px;
+      }
