@@ -23,7 +23,7 @@ function Header() {
                 <li><img src={logo} width="80px" height="auto" />{' '}</li>
             </ul>
             <ul>
-                <li className='h1'>PAMANTASAN NG LUNGSOD NG MAYNILA</li>
+                <li className='h1'>PAMANTANGINA NG LUNGSOD NG MAYNILA</li>
                 <li className='h2'>UNIVERSITY OF THE CITY OF MANILA</li>
             </ul>
         </Navbar.Brand>

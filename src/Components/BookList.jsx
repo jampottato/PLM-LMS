@@ -29,7 +29,6 @@ function BooksList() {
                     material_id : docMaterial.id,
                     material_title : docMaterial.data().material_title,
                     material_copies : docMaterial.data().material_copies,
-                    material_title : docMaterial.data().material_title,
                     material_description : docMaterial.data().material_description
                 }))
             )

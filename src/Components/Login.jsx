@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button';
 import { BsMicrosoft } from "react-icons/bs";
 import { signInWithMicrosoft } from "../Database/firebase-config"
 import { useNavigate } from "react-router-dom";
+import EnterInfo from "../Routes/EnterInfo";
 
 function Login() {
     
@@ -10,10 +11,12 @@ function Login() {
     const login = async () => {
       await signInWithMicrosoft()
         .then((result) =>{ 
-            console.log(result.user.email);
+            console.log("HERE IS ITSHSHSHHSHSHS")
+            console.log(result);
             localStorage.setItem('name', result.user.displayName);
             localStorage.setItem('email', result.user.email);
             navigate('/StdHome')
+            
           })
         .catch((error) => {
             console.log(error.message);

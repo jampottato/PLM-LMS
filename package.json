@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mantine/core": "^6.0.11",
+    "@mantine/hooks": "^6.0.11",
     "bootstrap": "^5.2.3",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.4",
@@ -17,7 +19,7 @@
     "react-router-dom": "^6.11.1"
   },
   "devDependencies": {
-    "@emotion/react": "^11.10.5",
+    "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.3",

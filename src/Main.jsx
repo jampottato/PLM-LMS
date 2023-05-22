@@ -6,6 +6,7 @@ import StdNav from "./Components/StdNav";
 import StdHome from "./Routes/StdHome";
 import Tutorial from "./Routes/Tutorial";
 import Homevs from "./Routes/Homevs";
+import EnterInfo from "./Routes/EnterInfo";
 
 function Main() {
   return (
@@ -18,6 +19,7 @@ function Main() {
       <Route path="/StdNav" element={<StdNav/>}/>
       <Route path="/StdHome" element={<StdHome/>}/>
       <Route path="/Homevs" element={<Homevs/>}/>
+      <Route path="/EnterInfo" element={<EnterInfo/>}/>
     </Routes>
    </Router>
   );
