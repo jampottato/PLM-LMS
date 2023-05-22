@@ -1,0 +1,23 @@
+import React,{useState} from "react";
+import { ActionIcon, ColorSchemeProvider, useMantineColorScheme, MantineProvider } from "@mantine/core";
+import DarkModeButton from "./DarkModeButton";
+
+
+function App() {
+  const [colorScheme, setColorScheme] = useState("light");
+  const toggleColorScheme = (ColorScheme) =>
+    setColorScheme(colorScheme === "dark" ? "light" : "dark");
+
+  return (
+    <>
+    <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
+      <MantineProvider theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
+       <DarkModeButton/>
+      </MantineProvider>
+    
+    </ColorSchemeProvider>
+    </>
+  );
+}
+
+export default App;
