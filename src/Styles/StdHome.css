@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap');
+
+.Body{
+    height: auto;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content:space-around;
+}
+
+.Content{
+    height: auto;
+    width: auto;
+    padding: 20px;
+    display: flex;
+}
+
+.result{
+    height: auto;
+    width: 400px;
+    padding: 10px;
+    margin: auto;
+    border: 2px groove black;
+    border-radius: 6px;
+    justify-content:space-around;
+}
+
+.transrec{
+    height: auto;
+    width: 400px;
+    margin: auto;
+    padding: 10px;
+    border: 2px groove black;
+    border-radius: 6px;
+    justify-content:space-around;
+}
+
+
+h2{
+    font-family: 'Rubik', sans-serif;
+    font-size: 23px;
+    font-weight: normal;
+    margin: 15px;
+    padding: 10px;
+
+}
