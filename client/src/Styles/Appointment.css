@@ -1,0 +1,25 @@
+.form{
+    height: 700px;
+    width: 400px;
+    margin:auto;
+    padding: 25px;
+    justify-content: center;
+}
+
+input{
+    border: black 2px solid;
+    margin:auto;
+    padding: 10px;
+    justify-content: space-around;
+    display:flex
+
+}
+
+button{
+    padding: 10px;
+    margin-left: 133px;
+    margin-top: 10px;
+    height: auto;
+    width: auto;
+    display: flex; 
+}
