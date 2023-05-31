@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getFirestore } from "firebase/firestore";
+// import {View, Text} from 'react-native';
 
 import StdNav from '../Components/StdNav';
 import Footer from "../Components/Footer";
@@ -23,6 +24,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+
 
 
 function StdHome() {
@@ -101,10 +103,11 @@ function StdHome() {
       if(v.size > 0){
         v.forEach((doc)=>{
           if(doc.data().is_completed == true){
-            setOpen(false)
+            setSN(doc.data().student_number)
+            localStorage.setItem("sn", sn)
+            setOpen(false);
           } else {
             setOpen(true)
-            console.log("2UMI::OTILSI")
           } 
         })
       } else {
@@ -117,6 +120,7 @@ function StdHome() {
 
   const filterInpSN = (val) => {
     setSN(val.replace(/\D/g, ''))
+
   }
 
   const colleges = ['CET','PLMBS','CN', 'COS', 'CHASS', 'COL', 'CAUP', 'CPT', 'Educ']
@@ -191,7 +195,7 @@ function StdHome() {
   }
 
   return (
-    <>
+  <>
     <Dialog open={open} maxWidth="md" fullWidth="false" scroll="body">
       <DialogTitle>Enter your details.</DialogTitle>
       <DialogContent>
@@ -241,7 +245,6 @@ function StdHome() {
                 onChange={e => setProgram(e.target.value)}
                 label="Program"
                 value={program}
-                placeholder="Piliin mo taga CET"
               >
                 {programs.map(item => (
                   <MenuItem value={item}>{item}</MenuItem>
@@ -262,19 +265,20 @@ function StdHome() {
     
     <div className='Body'>
       <StdNav/>
-      <h2> WELCOME, {name} </h2>
-        <div className='Content'>
-       
-          <div className="result">
-            <BooksList/>
-          </div>
-          <div className="transrec">
-            <BorrowRecord/>
-          </div>
-        </div>
-        <Footer/>
-       </div>
-    </>
+      <>
+        <BooksList/>
+      </>
+      {/* <div className='Content'> */}
+        
+        {/* <div className="transrec"> */}
+        <>
+          <BorrowRecord/>
+          </>
+        {/* </div> */}
+      {/* </div> */}
+      <Footer/>
+    </div>
+  </>
   ) 
 }
 

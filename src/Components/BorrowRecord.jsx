@@ -1,6 +1,8 @@
 import {useState, useEffect} from "react";
 import {db} from "../Database/firebase-config";
 import {setDoc, doc, query, collection, where, getDocs, onSnapshot, getDoc, QuerySnapshot, addDoc, documentId, updateDoc} from "firebase/firestore";
+import { Container } from "react-bootstrap";
+import '../Styles/BorrowRecord.css';
 
 function BorrowRecord() {
 //show : TItle, Status, Due, Penalty
@@ -12,7 +14,7 @@ function BorrowRecord() {
     const colRefIssue = collection(db, "Issue")
     let activeStudentNum = localStorage.getItem("email");
     let studentBorrows = query(colRefIssue, where("issue_confirmed", "==", true), where("patron_id", "==", activeStudentNum));
-   console.log(studentBorrows)
+    console.log(activeStudentNum)
     
     useEffect(()=>{
         const borrowed = async () => {
@@ -100,22 +102,25 @@ function BorrowRecord() {
     },[specificResult])
     
   return (
-    <div>
-        <h1>YOU BORROWED THESE</h1>
-        {specificResult.map(doc => {
-            return (
-                <div className = "BookSection">
-                    <pre>Title, Status, Due, Penalty</pre>
-                    <p> Book Title:         <strong>{doc.material_title}</strong><br/>
-                        Status:             <strong>{doc.issue_confirmed}</strong><br/>
-                        Due:                <strong>{doc.issue_due}</strong><br/>
-                        Penalty:            <strong>{doc.issue_fine}</strong><br/>
-                    </p>
-                </div>
-            )
-        })}
-        
-    </div>
+    <>
+        <Container fluid='true' className="result">
+            <div className="panel"></div>   
+            <div className="searched-content">
+                {specificResult.map(doc => {
+                    return (
+                        <div className = "BorrowSection">
+                            <pre>Title, Status, Due, Penalty</pre>
+                            <p> Book Title:         <strong>{doc.material_title}</strong><br/>
+                                Status:             <strong>{doc.issue_confirmed}</strong><br/>
+                                Due:                <strong>{doc.issue_due}</strong><br/>
+                                Penalty:            <strong>{doc.issue_fine}</strong><br/>
+                            </p>
+                        </div>
+                    )
+                })}
+            </div>
+        </Container>
+    </>
   );
 }
 
