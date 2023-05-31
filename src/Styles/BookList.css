@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap');
+
+.BookSection {
+    width: fit-content;
+    padding: 10px;
+    border: 1px solid black;
+}
+.header-texts{
+    font-family: 'Rubik', sans-serif;
+    font-size: 23px;
+    font-weight: normal;
+    margin: 0px 0 5px 0px;
+}
+.subheader-texts{
+    font-family: 'Rubik', sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+    margin: 0px 0px 0px 0px;
+}
+.p-edited, .input-edited {
+    display: inline-block;
+    margin-right: 0;
+    margin-left:auto;
+}
+
+.welcome-msg {
+    padding-left: 30px;
+}
+
+.search-box {
+    text-align: right;
+    padding-right: 50px;
+}
+
+.head-search {
+    margin-top: 15px;
+    margin-top: 20px;
+    width: 100%;
+    PADDING: 0;
+    margin-right: 0;
+    margin-left:auto;
+}
+.hs{
+    width: 90%;
+    margin-right: 30px;
+    margin-left:auto;
+}
+.panel {
+    width: 100%;
+    height: 40px;
+    background-color: rgb(50, 58, 165);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    margin-top: -1px;
+    padding-left: 1px;
+}
+
+.searched-content {
+    margin: 40px;
+    height: auto;
+}
+
+.result {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 80%;
+    PADDING: 0;
+    border: 1px solid rgb(0, 0, 0);
+    border-radius: 6px;
+}

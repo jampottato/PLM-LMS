@@ -6,7 +6,6 @@ import "../Styles/Appointment.css"
 import {useState, useEffect} from "react";
 import {db} from "../Database/firebase-config";
 import {addDoc, collection, setDoc, doc, getDocs, updateDoc} from "firebase/firestore"
-
 function Appointment() {
 
      //full name, student number, patron type, program, college, section, email

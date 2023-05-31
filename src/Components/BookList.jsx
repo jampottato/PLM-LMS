@@ -1,6 +1,11 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, Fragment} from "react";
 import {db} from "../Database/firebase-config";
 import {setDoc, doc, query, collection, where, getDocs, onSnapshot, getDoc, QuerySnapshot, addDoc, updateDoc} from "firebase/firestore";
+import "../Styles/BookList.css"
+import { Button, Flex, Grid, Input} from '@mantine/core';
+import { IconSearch } from "@tabler/icons-react";
+import { Container } from "react-bootstrap";
+import { style } from "@mui/system";
 
 function BooksList() {
     let activeStudentNum = localStorage.getItem("email");
@@ -109,7 +114,9 @@ function BooksList() {
         }
     }
 
-    const searchQ = () => {
+    const searchQ = (val) => {
+        setSearchVal(val)
+
         console.log(searchVal);
         studentRawQueryCategory = searchVal
 
@@ -126,25 +133,81 @@ function BooksList() {
         console.log("Searchres",searchRes)
     },[searchRes])
 
-  return (
-    <div className="BooksList">
-        <input  placeholder="Search materials here"
-                onChange={e => setSearchVal(e.target.value)}/>
-        <button onClick={searchQ}>HERE</button>
+    const noRefresh = (event) => {
+        event.preventDefault();
+        // searchQ
+    }
 
-        {searchRes.map((doc)=> {
-            return (
-                <div className="BookSection">
-                    <p> Book ISBN:          <strong>{doc.book_isbn}</strong><br/>
-                        Book Title:         <strong>{doc.material_title}</strong><br/>
-                        Book Description:   <strong>{doc.material_description}</strong><br/>
-                        Copies:             <strong>{doc.material_copies}</strong><br/>
-                    </p>
-                    <button onClick={()=>getInfo(doc.material_id, doc.material_title)}>BORROW</button>
-                </div>
-            );
-        })}
+  return (
+    <>
+    <div>
+        <Container fluid='true' className="head-search">
+            <Grid className="hs">
+                <Grid.Col span={5} className="welcome-msg">
+                    <h2 className="header-texts"><strong>Welcome, {localStorage.getItem("name")}</strong></h2>
+                    <p className="subheader-texts">STUDENT NUMBER: {localStorage.getItem("sn")}</p>
+                </Grid.Col>
+
+                <Grid.Col span={3}></Grid.Col>
+
+                <Grid.Col span={4} className="search-box">
+                <Flex direction="row" gap="sm" align="center" justify="center" wrap="wrap">
+                <form onSubmit={noRefresh} focused="true" target="_self">
+                    <Input
+                        icon={<IconSearch size={25} />}
+                        placeholder="Search"
+                        radius="lg"
+                        className="input-edited"
+                        onChange={e => searchQ(e.target.value)}
+                    />
+                    <Button type="submit" onClick={searchQ} size="xs" radius="xl" hidden="true">
+                        Search
+                    </Button>
+                </form>
+                </Flex>
+                    {/* <input  placeholder="Search materials here"
+                            onChange={e => setSearchVal(e.target.value)}
+                            className="input-edited"/>
+                    <button onClick={searchQ}
+                            className="input-edited">
+                                HERE
+                    </button> */}
+                </Grid.Col>
+            </Grid>
+        </Container>
+
+        <Container fluid='true' className="result">
+            <div className="panel"></div>
+            <div className="searched-content">
+            <Grid>
+                {searchRes.map((doc)=> {
+                    return (
+                        <>
+                            {/* <div className="BookSection">
+                                <p> Book ISBN:          <strong>{doc.book_isbn}</strong><br/>
+                                    Book Title:         <strong>{doc.material_title}</strong><br/>
+                                    Book Description:   <strong>{doc.material_description}</strong><br/>
+                                    Copies:             <strong>{doc.material_copies}</strong><br/>
+                                </p>
+                                <button onClick={()=>getInfo(doc.material_id, doc.material_title)}>BORROW</button>
+                            </div> */}
+
+                            <Grid.Col span={4} className="BookSection">
+                                <p> Book ISBN:          <strong>{doc.book_isbn}</strong><br/>
+                                    Book Title:         <strong>{doc.material_title}</strong><br/>
+                                    Book Description:   <strong>{doc.material_description}</strong><br/>
+                                    Copies:             <strong>{doc.material_copies}</strong><br/>
+                                </p>
+                                <button onClick={()=>getInfo(doc.material_id, doc.material_title)}>BORROW</button>
+                            </Grid.Col>
+                        </>
+                    );
+                })}
+            </Grid>
+            </div>
+        </Container>
     </div>
+    </>
   );
 }
 

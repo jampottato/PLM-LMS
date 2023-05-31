@@ -13,10 +13,12 @@
     "@mantine/core": "^6.0.11",
     "@mantine/form": "^6.0.11",
     "@mantine/hooks": "^6.0.11",
+    "@tabler/icons-react": "^2.20.0",
     "bootstrap": "^5.2.3",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.4",
     "react-dom": "^18.2.0",
+    "react-native": "^0.71.8",
     "react-router-dom": "^6.11.1"
   },
   "devDependencies": {
