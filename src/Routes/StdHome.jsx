@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { getFirestore } from "firebase/firestore";
-// import {View, Text} from 'react-native';
 
 import StdNav from '../Components/StdNav';
 import Footer from "../Components/Footer";
@@ -8,9 +6,8 @@ import "../Styles/StdHome.css"
 import BooksList from "../Components/BookList";
 import BorrowRecord from "../Components/BorrowRecord";
 
-import { doc, setDoc, addDoc, collection, getDoc, query, where, getDocs } from "firebase/firestore";
-import { db } from "../Database/firebase-config";
-import { useNavigate } from "react-router-dom";
+import { addDoc, collection, query, where, getDocs, setDoc, doc } from "firebase/firestore";
+import { db, auth } from "../Database/firebase-config";
 
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -29,15 +26,12 @@ import Select from '@mui/material/Select';
 
 function StdHome() {
   const [name, setName] = useState("");
-  const [sn, setSN] = useState("");
+  const [pn, setPN] = useState('');
   const [studentInp, setStudentInp] = useState("")
   const [college, setCollege] = useState("")
   const [program, setProgram] = useState("")
   const [programs, setPrograms] = useState([])
   const [open, setOpen] = useState(false);
-
-  
-
   const cetPrograms = [
     "Bachelor of Science in Chemical Engineering - BSCHE",
     "Bachelor of Science in Civil Engineering - BSCE",
@@ -94,60 +88,109 @@ function StdHome() {
     "Bachelor of Science in Tourism Management - BSTM"
   ]
 
-  const confirmEnteredData = query(collection(db, "UserData"), where("email", "==", localStorage.getItem("email")))
-  const snapshotQuery = async () => {
-    console.log("UMI::OTILSI")
-    await getDocs(confirmEnteredData).then((v) => {
-      console.log("DOCS SEARCHED")
-      console.log(v.size)
-      if(v.size > 0){
-        v.forEach((doc)=>{
-          if(doc.data().is_completed == true){
-            setSN(doc.data().student_number)
-            localStorage.setItem("sn", sn)
-            setOpen(false);
-          } else {
-            setOpen(true)
-          } 
-        })
-      } else {
-        setOpen(true)
-        console.log("3UMI::OTILSI")
-      }
-    })
-  }
-  snapshotQuery();
+  const [activePatronEmail, setActivePatronEmail] = useState(localStorage.getItem('email'))
+
+  var user = auth.currentUser;
+  // console.log('Value of em')
+  // console.log(em)
+  console.log('FIRST\t' + pn)
+  const confirmEnteredData = query(collection(db, "UserData"), where("patron_email", "==", activePatronEmail))
+  // console.log('confirmEnteredData EMAIL')
+  // console.log(em)
+  // if (user != null) {
+  //   console.log(user.email)
+  // }
+  // console.log('-----------------')
+
+  useEffect(()=>{
+    if(user == null){
+      // alert('NULL')
+    } else {
+        // alert(user.email)   
+        setActivePatronEmail(user.email)
+    }
+  },[user])
+    // Check if the user has already ENTERED DATA completely
+    // if yes : no need for modal
+    // if no : show modal
+    const snapshotQuery = async () => {
+      await getDocs(confirmEnteredData).then((v) => {
+        console.log('Entered here')
+        // alert('active email'+activePatronEmail)
+        if(v.size > 0){
+          v.forEach((doc)=>{
+            console.log("snapShotQuery")
+            console.log(doc.data())
+            if(doc.data().is_completed == true){
+              console.log('is completed true')
+              setPN(doc.data().patron_id)
+              // localStorage.setItem("pn", pn)
+              setOpen(false);
+            } else {
+              console.log('is completed false')
+              setOpen(true)
+            } 
+          })
+        } else {
+          console.log('query 0 or -1')
+          console.log(v.size)
+          console.log('--------------')
+          setOpen(true)
+        }
+      })
+    }
+    snapshotQuery();
 
   const filterInpSN = (val) => {
-    setSN(val.replace(/\D/g, ''))
-
+    setPN(val.replace(/\D/g, ''))
   }
+
+  console.log('SECOND\t' + pn)
 
   const colleges = ['CET','PLMBS','CN', 'COS', 'CHASS', 'COL', 'CAUP', 'CPT', 'Educ']
 
   const handleClose = async (event) => {
-    if(sn.length == 9) {
+    if(pn.length == 9) {
       setStudentInp("")
-      console.log(studentInp)
+      // console.log(studentInp + '/tINPUT')
     }
 
-    if(sn.length == 9 && program.length > 0 && college.length > 0){
+    if(pn.length == 9 && program.length > 0 && college.length > 0){
       setStudentInp("")
+      // console.log("ADDING SOME DATA NOW")
       // Add the user entered data
       await addDoc(collection(db,"UserData"), {
         college:college,
-        email:localStorage.getItem("email"),
-        name:localStorage.getItem("name"),
+        patron_email:localStorage.getItem("email"),
+        patron_name:localStorage.getItem("name"),
         program:program,
-        student_number:sn,
+        patron_id:pn,
         is_completed:true
       })
+
+      // ERROR HERE : FIX THIS BUG
+      alert(activePatronEmail)
+      const whereIsUser = query(collection(db, 'UserDataTest'), where('email','==',activePatronEmail))
+      await getDocs(whereIsUser).then((value)=>{
+        value.forEach((v)=>{
+          setDoc(doc(db, "UserDataTest",v.id),{
+            college:college,
+            program:program,
+            patron_id:pn,
+            is_completed:true
+          },{merge:true})
+        })
+        
+      })
+      
+      console.log("DONE ADDING PN", pn)
       setOpen(false);
+      window.location.reload()
     } else {
-      alert("SN LENGTH\t" + sn.length)
-      if(sn.length < 9) {
+      alert("SN LENGTH\t" + pn.length)
+      if(pn.length < 9) {
         setStudentInp("You have missed some digits")
-        console.log(studentInp)
+        // console.log(studentInp)
       } else {
         setStudentInp("")
       }
@@ -157,7 +200,7 @@ function StdHome() {
 
   useEffect(() => {
     setName(localStorage.getItem("name"));
-
+    // console.log("MANY THINGS HERE")
     // When College is selected, specific programs for it will be shown in the dropdown of PROGRAMS
     switch (college) {
       case undefined:
@@ -188,7 +231,7 @@ function StdHome() {
         setPrograms(["Bachelor of Science in Nursing"])
         break;
     } 
-  }, [name, college, sn, studentInp]);
+  }, [name, college, pn, studentInp]);
 
   const noRefresh = (event) => {
     event.preventDefault();
@@ -212,7 +255,7 @@ function StdHome() {
                   id="sn"
                   label="Student Number"
                   type="text"
-                  value={sn}
+                  value={pn}
                   onChange={e => filterInpSN(e.target.value)}
                 /> 
               <FormHelperText>{studentInp}</FormHelperText>
@@ -266,16 +309,11 @@ function StdHome() {
     <div className='Body'>
       <StdNav/>
       <>
-        <BooksList/>
+        <BooksList activePID={pn}/>
       </>
-      {/* <div className='Content'> */}
-        
-        {/* <div className="transrec"> */}
-        <>
-          <BorrowRecord/>
-          </>
-        {/* </div> */}
-      {/* </div> */}
+      <>
+				<BorrowRecord/>
+      </>
       <Footer/>
     </div>
   </>

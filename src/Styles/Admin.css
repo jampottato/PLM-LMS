@@ -1,0 +1,25 @@
+.reserved-item {
+    border: 1px solid black;
+    margin-bottom: 50px;
+}
+
+.confirmed-btn {
+    margin:0; 
+    padding:0 30px 0 30px;
+    max-width: 100%;
+}
+
+.nconfirmed-btn {
+    margin:0; 
+    padding:0 10px 0 10px;
+    max-width: 100%;
+}
+
+.paginate{
+    width: 80%;
+    display: flex;
+}
+
+.admin-borrower-result {
+    display: hidden;
+}

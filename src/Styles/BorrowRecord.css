@@ -8,6 +8,6 @@
 }
 
 .borrow-content {
-    margin-left: 40px;
-    margin-top:  20px;
+    margin: 40px;
+    height: auto;
 }

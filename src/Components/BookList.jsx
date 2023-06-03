@@ -1,16 +1,19 @@
-import {useState, useEffect, Fragment} from "react";
+import {useState, useEffect} from "react";
 import {db} from "../Database/firebase-config";
-import {setDoc, doc, query, collection, where, getDocs, onSnapshot, getDoc, QuerySnapshot, addDoc, updateDoc} from "firebase/firestore";
-import "../Styles/BookList.css"
+import "../Styles/BookList.css";
+
 import { Button, Flex, Grid, Input} from '@mantine/core';
 import { IconSearch } from "@tabler/icons-react";
 import { Container } from "react-bootstrap";
-import { style } from "@mui/system";
 
-function BooksList() {
-    let activeStudentNum = localStorage.getItem("email");
-    let patronType = "Student";
+import {doc, query, collection, onSnapshot, getDoc, addDoc, updateDoc} from "firebase/firestore";
 
+
+function BooksList(props) {
+    let activePatronEmail = localStorage.getItem("email");
+    let activePatronName = localStorage.getItem("name");
+    // let activePatronSN = localStorage.getItem("pn");
+    let activePatronSN = props.activePID
     //MATERIAL DETAILS
     const [searchRes, setSearchRes] = useState([])
     const [materialResult, setMaterialResult] = useState([])
@@ -18,31 +21,21 @@ function BooksList() {
     //SEARCH VALUE
     const [searchVal, setSearchVal] = useState("")
     //REFERNCES
-    const colRefBooks = collection(db, "Book")
     const colRefMaterial = collection(db, "Material")
-    const colRefIssue = collection(db, "Issue")
 
     //START: search for something with material title and category
-    const studentRawQueryTitle = "Title 1";
-    let studentRawQueryCategory = "";
     let studentQueryBook = query(colRefMaterial);
+
+    //BORROW Button disable/able
+    const [dAble, setDAble] = useState(true)
     
-    const ff = async ()=>{
-        await onSnapshot(studentQueryBook, (qSnapshot)=>{
-            setMaterialResult(
-                qSnapshot.docs.map((docMaterial)=>({
-                    material_id : docMaterial.id,
-                    material_title : docMaterial.data().material_title,
-                    material_copies : docMaterial.data().material_copies,
-                    material_description : docMaterial.data().material_description
-                }))
-            )
-        })
+    // Disable the borrow button when the copies of book are 0 
+    const disableWhenZero = (val) => {
+        return parseInt(val) > 0 ? false : true
     }
 
     useEffect(()=>{
         const ff = async ()=>{
-            console.log("ADDED")
             await onSnapshot(collection(db,"Material"), (qSnapshot)=>{
                 setMaterialResult(
                     qSnapshot.docs.map((docMaterial)=>({
@@ -57,17 +50,13 @@ function BooksList() {
         ff()
     },[])
 
-
-    let result = []
     useEffect(() => {
         const allMaterials = async () => {
             setTotalRes([])
             setSearchRes([])
             await materialResult.map((idd)=>{
-                // console.log("COPIES",idd.material_copies, "\t",idd.material_id)
                 
-                onSnapshot(doc(db, "Book", idd.material_id), ((doc)=>{
-                    // console.log("MATID",doc, "\t", idd.material_id)      
+                onSnapshot(doc(db, "Book", idd.material_id), ((doc)=>{   
                     let oo = doc.data()
                     oo.material_id = idd.material_id
                     oo.material_title = idd.material_title
@@ -87,39 +76,46 @@ function BooksList() {
         let copies = 0
         let dateToday = new Date()
         let dateTomorrow = new Date()
-        dateTomorrow.setDate(dateToday.getDate()+1)
+        dateTomorrow.setDate(dateToday.getDate()+2)
 
         await getDoc(doc(db, "Material", bId)).then((doc)=> {
-            copies = parseInt(parseInt(doc.data().material_copies) - 1)
-            console.log("COPIES", copies)
+            copies = parseInt(parseInt(doc.data().material_copies))
+            console.log("When BORROW btn clicked, the copies before are ", copies)
         })
 
-        //check
-        await addDoc(collection(db, "Issue"), {
-            patron_id : activeStudentNum,
-            material_id : bId,
-            material_title: title,
-            issue_confirmed : false,
-            issue_checkout_date : dateToday, //today
-            issue_due : dateTomorrow, // tomorrow
-            issue_fine : 0 // 0
-        })
-        
-        if(copies > -1){
+        // ## the adding of items in ISSUE must first consider these
+        // 1. When borrower has confirmed, specified material data must decrease to 1
+        if(copies > 0){
             await updateDoc(doc(db, "Material", bId), {
-                material_copies: copies
+                material_copies: (copies-1)
             })
-        } else {
+            // 2. The button should turn diasabled then the copies of this material is 0
+            // 3. Then add the necessary details to ISSUE entity 
+            // Add the borrower info and material borrowed to the ISSUE entity
+            
+            // Get the UserData of the logged in BORROWER and get IDNUMBER, email and name
+            await addDoc(collection(db, "Issue"), {
+                patron_id : activePatronSN,
+                patron_name : activePatronName,
+                patron_email : activePatronEmail,
+                material_id : bId,
+                material_title: title,
+                issue_confirmed : false,
+                issue_checkout_date : dateToday, //today
+                issue_due : dateTomorrow, // tomorrow
+                issue_fine : 0 // 0
+            })
+            window.location.reload()
+        } 
+        else {
             alert("There are 0 copies, you could not borrow this")
         }
     }
 
     const searchQ = (val) => {
         setSearchVal(val)
-
         console.log(searchVal);
-        studentRawQueryCategory = searchVal
-
+        // studentRawQueryCategory = searchVal
         const tt = totalRes.filter((item)=>{
             const title = item.material_title.toLowerCase()
             const desc = item.material_description.toLowerCase()
@@ -130,12 +126,12 @@ function BooksList() {
     }
 
     useEffect(()=>{
-        console.log("Searchres",searchRes)
+        // testing searchRes value - console.log("Searchres",searchRes)
+        // use this when you want to do something when searchRes changes
     },[searchRes])
 
     const noRefresh = (event) => {
         event.preventDefault();
-        // searchQ
     }
 
   return (
@@ -145,7 +141,7 @@ function BooksList() {
             <Grid className="hs">
                 <Grid.Col span={5} className="welcome-msg">
                     <h2 className="header-texts"><strong>Welcome, {localStorage.getItem("name")}</strong></h2>
-                    <p className="subheader-texts">STUDENT NUMBER: {localStorage.getItem("sn")}</p>
+                    <p className="subheader-texts">STUDENT NUMBER: {activePatronSN}</p>
                 </Grid.Col>
 
                 <Grid.Col span={3}></Grid.Col>
@@ -160,7 +156,7 @@ function BooksList() {
                         className="input-edited"
                         onChange={e => searchQ(e.target.value)}
                     />
-                    <Button type="submit" onClick={searchQ} size="xs" radius="xl" hidden="true">
+                    <Button type="submit" onClick={searchQ} size="xs" radius="xl" hidden={true}>
                         Search
                     </Button>
                 </form>
@@ -176,6 +172,16 @@ function BooksList() {
             </Grid>
         </Container>
 
+        <Container fluid='true' className="head-search">
+            <Grid className="hs">
+                <Grid.Col span={5} className="welcome-msg">
+                    <h2 className="header-texts"><strong>Results</strong></h2>
+                </Grid.Col>
+                <Grid.Col span={3}></Grid.Col>
+                <Grid.Col span={4}></Grid.Col>
+            </Grid>
+        </Container>
+
         <Container fluid='true' className="result">
             <div className="panel"></div>
             <div className="searched-content">
@@ -183,22 +189,13 @@ function BooksList() {
                 {searchRes.map((doc)=> {
                     return (
                         <>
-                            {/* <div className="BookSection">
-                                <p> Book ISBN:          <strong>{doc.book_isbn}</strong><br/>
-                                    Book Title:         <strong>{doc.material_title}</strong><br/>
-                                    Book Description:   <strong>{doc.material_description}</strong><br/>
-                                    Copies:             <strong>{doc.material_copies}</strong><br/>
-                                </p>
-                                <button onClick={()=>getInfo(doc.material_id, doc.material_title)}>BORROW</button>
-                            </div> */}
-
                             <Grid.Col span={4} className="BookSection">
                                 <p> Book ISBN:          <strong>{doc.book_isbn}</strong><br/>
                                     Book Title:         <strong>{doc.material_title}</strong><br/>
                                     Book Description:   <strong>{doc.material_description}</strong><br/>
                                     Copies:             <strong>{doc.material_copies}</strong><br/>
                                 </p>
-                                <button onClick={()=>getInfo(doc.material_id, doc.material_title)}>BORROW</button>
+                                <button onClick={()=>getInfo(doc.material_id, doc.material_title)} disabled={disableWhenZero(doc.material_copies)}>BORROW</button>
                             </Grid.Col>
                         </>
                     );
