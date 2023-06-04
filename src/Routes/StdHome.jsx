@@ -119,22 +119,22 @@ function StdHome() {
         // alert('active email'+activePatronEmail)
         if(v.size > 0){
           v.forEach((doc)=>{
-            console.log("snapShotQuery")
-            console.log(doc.data())
+            // console.log("snapShotQuery")
+            // console.log(doc.data())
             if(doc.data().is_completed == true){
-              console.log('is completed true')
+              // console.log('is completed true')
               setPN(doc.data().patron_id)
               // localStorage.setItem("pn", pn)
               setOpen(false);
             } else {
-              console.log('is completed false')
+              // console.log('is completed false')
               setOpen(true)
             } 
           })
         } else {
-          console.log('query 0 or -1')
-          console.log(v.size)
-          console.log('--------------')
+          // console.log('query 0 or -1')
+          // console.log(v.size)
+          // console.log('--------------')
           setOpen(true)
         }
       })
@@ -170,18 +170,6 @@ function StdHome() {
 
       // ERROR HERE : FIX THIS BUG
       alert(activePatronEmail)
-      const whereIsUser = query(collection(db, 'UserDataTest'), where('email','==',activePatronEmail))
-      await getDocs(whereIsUser).then((value)=>{
-        value.forEach((v)=>{
-          setDoc(doc(db, "UserDataTest",v.id),{
-            college:college,
-            program:program,
-            patron_id:pn,
-            is_completed:true
-          },{merge:true})
-        })
-        
-      })
       
       console.log("DONE ADDING PN", pn)
       setOpen(false);
@@ -239,7 +227,7 @@ function StdHome() {
 
   return (
   <>
-    <Dialog open={open} maxWidth="md" fullWidth="false" scroll="body">
+    <Dialog open={open} maxWidth="md" fullWidth={false} scroll="body">
       <DialogTitle>Enter your details.</DialogTitle>
       <DialogContent>
         <form onSubmit={noRefresh} focused="true" target="_self">

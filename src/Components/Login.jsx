@@ -24,12 +24,6 @@ function Login() {
             localStorage.setItem('name', result.user.displayName);
             localStorage.setItem('email', result.user.email);
 
-            addDoc(collection(db, "UserDataTest"),{
-              email:result.user.email,
-              name:result.user.displayName,
-              is_completed:false
-            })
-
             console.log('GO BEFORE ANYTHING')
             // For testing purposes, it is set to 0, set to 1 for production
             if (containsNumbers(result.user.email) == 1 ){
