@@ -22,6 +22,10 @@ import {
 
 function AdminBorrowTable(props) {
 
+    useEffect(()=>{
+      alert('Result')
+      console.log('RESULT OF SEARCH RES:\t', props.searchValue)
+    }, [])
 
     const tableP = {
         width: '80%',
@@ -40,7 +44,7 @@ function AdminBorrowTable(props) {
       const [defaultColumnWidths] = useState([
         { columnName: 'patron_id', width: 103 },
         { columnName: 'patron_name', width: 250 },
-        { columnName: 'material_title', width: 200 },
+        { columnName: 'm_title', width: 200 },
         { columnName: 'issue_due', width: 180 },
         { columnName: 'issue_fine', width: 120 },
         { columnName: 'issue_status', width: 200 },

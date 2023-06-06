@@ -13,18 +13,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { IconTrash } from "@tabler/icons-react";
 
 
-
 import AdminBorrowTable from "./AdminBorrowTable";
 import { Fragment } from "react";
 import AdminAppointmentTable from "./AdminAppointmentTable";
-const PAGE_SIZES = [3, 10, 15, 20];
 
 function Admin() {
-/*
-    CHANGES IN DB
-    - issue_confirmed changed to issue_status
-        - their type is now STRING ['confirmed', 'not confirmed', 'returned'] instead of Boolean
-*/
     const STATUS_ARR = ['not confirmed', 'confirmed', 'returned']
     const [status, setStatus] = useState('')
     const [activeMaterial, setActiveMaterial] = useState('')
@@ -36,51 +29,46 @@ function Admin() {
     const [issueResult, setIssueResult] = useState([])
     const [specificResult, setSpecResult] = useState([])
     const colRefIssue = collection(db, "Issue")
-    // console.log(activeStudentNum)
+    
     const [searchRes, setSearchRes] = useState([])
     const [searchVal, setSearchVal] = useState("")
 
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[1]);
-
     useEffect(() => {
-        setPage(1);
-    }, [pageSize]);
-    const [page, setPage] = useState(1);
-
-    useEffect(() => {
+        // alert('SPECIFIC RESULT CHANGED 1')
         setSearchRes(specificResult)
         // alert(searchRes)
-        console.log('RESULT SERRCH')
-        console.log(searchRes)
-    }, [specificResult, page, pageSize]);
+        // console.log('SEARCH RESULT')
+        // console.log(searchRes)
+    }, [specificResult]);
+
+
     
     useEffect(()=>{
         const borrowed = async () => {
             await getDocs(colRefIssue).then( res => {
-                // console.log('SOMETHING HERE RES')
-                // console.log(res.docs)
                 //ISSUE Entity
                 setIssueResult(
                     res.docs.map((doc)=>({
                         issue_id:           doc.id,
-                        issue_status:       doc.data().issue_status,
-                        issue_fine:         doc.data().issue_fine,
-                        issue_due:          doc.data().issue_due,         
                         issue_checkout_date:doc.data().issue_checkout_date,
-                        material_id:        doc.data().material_id,
+                        issue_due:          doc.data().issue_due,
+                        issue_fine:         doc.data().issue_fine,
+                        issue_status:       doc.data().issue_status,
+                        m_id:               doc.data().m_id,
+                        m_title:            doc.data().m_title,
+                        patron_email:       doc.data().patron_email,
                         patron_id:          doc.data().patron_id,
                         patron_name:        doc.data().patron_name,
-                        material_title:     doc.data().material_title,
                     }))
                 )
             })
-            
         }
         borrowed()
-        // console.log('Issue result')
-        // console.log(issueResult)
     }, [])
 
+    useEffect(()=>{
+        console.log('Issue result has been filled\t:\t',issueResult)
+    }, [issueResult])
     
     
     const confirmation = (m_status, issueID, matID) => {
@@ -98,6 +86,7 @@ function Admin() {
         
     }
 
+    // If admin has changed the status --> confirmed, returned, not confirmed
     useEffect(()=> {
         const updateConfirmedMat = async ()=>{
             if(status == 'confirmed'){
@@ -155,7 +144,7 @@ function Admin() {
                         </Button>
                         <ActionIcon onClick={()=>confirmation('returned', issueID, matID)} style={{display:"inline-block",margin:'2px',textAlign:'center'}} variant="subtle"><IconTrash size="17" /></ActionIcon>
                 </td>
-                )
+            )
         }
     }
     
@@ -165,13 +154,12 @@ function Admin() {
             console.log('spec result length')
             console.log(specificResult.length)
             await issueResult.map((idd)=>{
-                // alert('2')
                 let res = {}
-                const specificMat = getDoc(doc(db, "Material", idd.material_id)) 
+                const specificMat = getDoc(doc(db, "Material", idd.m_id)) 
                 
                 if(idd.issue_status == 'confirmed'){
                     //check if the date in DB is confirmed by admin
-                    res.issue_status = ll("confirmed", idd.issue_id, idd.material_id)
+                    res.issue_status = ll("confirmed", idd.issue_id, idd.m_id)
 
                     let dateToday = new Date()
 
@@ -215,17 +203,21 @@ function Admin() {
                         res.issue_fine = 0
                     }
                 } else {
-                    res.issue_status = ll("not confirmed", idd.issue_id, idd.material_id)
+                    res.issue_status = ll("not confirmed", idd.issue_id, idd.m_id)
                 }
                 
                 res = Object.assign(res, {patron_id: idd.patron_id, patron_name: idd.patron_name})
 
                 specificMat.then((doc)=>{
                     res = Object.assign(res, doc.data())   
+                    // alert('Material Result')
+                    // console.log(res)
 
                     //fix this by finding out the duplicating problem... then remove this logic
                     if(!(specificResult.includes(res))){
                         setSpecResult(prev => (prev.concat(res)))  
+
+                        // setSearchRes(prev => (prev.concat(res)))
                     }
                     
                 })
@@ -238,6 +230,7 @@ function Admin() {
         specResult()
         
     }, [issueResult])
+
     
 
     const noRefresh = (event) => {
@@ -252,15 +245,14 @@ function Admin() {
         studentRawQueryCategory = searchVal
 
         const filterSearch = specificResult.filter((item)=>{
-            const title = item.material_title.toLowerCase()
-            const desc = item.material_description.toLowerCase()
+            const title = item.m_title.toLowerCase()
             const name = item.patron_name.toLowerCase()
             const id =  item.patron_id
             return  title.includes(searchVal.toLowerCase()) || 
-                    desc.includes(searchVal.toLowerCase()) ||
                     name.includes(searchVal.toLowerCase()) ||
                     id.includes(searchVal.toLowerCase()) 
         })
+        
         setSearchRes(filterSearch)
         alert(filterSearch)
     }
@@ -269,7 +261,7 @@ function Admin() {
     const [columns] = useState([
         { name: 'patron_id', title: 'ID' },
         { name: 'patron_name', title: 'NAME' },
-        { name: 'material_title', title: 'TITLE' },
+        { name: 'm_title', title: 'TITLE' },
         { name: 'issue_due', title: 'DUE' },
         { name: 'issue_fine', title: 'PENALTY' },
         { name: 'issue_status', title: 'STATUS' },
@@ -312,7 +304,6 @@ function Admin() {
                             // icon={<IconSearch size={25} hidden={hiddRese}/>}
                             hidden={true}
                             icon={<IconSearch size={25} hidden={true}/>}
-
                             placeholder="Search"
                             radius="lg"
                             className="input-edited"
@@ -326,7 +317,6 @@ function Admin() {
                     </Flex>
                 </Grid.Col>
                 {/* UNTIL HERE - NOT SHOWN */}
-
             </Grid>
         </Container>
 

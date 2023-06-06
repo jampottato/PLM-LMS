@@ -6,24 +6,23 @@ import { Button, Flex, Grid, Input} from '@mantine/core';
 import { IconSearch } from "@tabler/icons-react";
 import { Container } from "react-bootstrap";
 
-import {doc, query, collection, onSnapshot, getDoc, addDoc, updateDoc} from "firebase/firestore";
+import {doc, query, collection, onSnapshot, getDoc, addDoc, updateDoc, getDocs} from "firebase/firestore";
 
 
-function BooksList(props) {
+function BookList(props) {
     let activePatronEmail = localStorage.getItem("email");
     let activePatronName = localStorage.getItem("name");
     // let activePatronSN = localStorage.getItem("pn");
     let activePatronSN = props.activePID
-    
     //MATERIAL DETAILS
     const [searchRes, setSearchRes] = useState([])
     const [materialResult, setMaterialResult] = useState([])
-    const [totalRes, setTotalRes] = useState([])
     
     //SEARCH VALUE
-    const [searchVal, setSearchVal] = useState("")
+    const [searchVal, setSearchVal] = useState(localStorage.getItem('college'))
+    //college my b emt
     
-    //REFERNCES
+    //REFERENCES
     const colRefMaterial = collection(db, "Material")
 
     // Disable the borrow button when the copies of book are 0 
@@ -31,25 +30,53 @@ function BooksList(props) {
         return parseInt(val) > 0 ? false : true
     }
 
+    const [testReadCounts, setTestReadCounts] = useState(0)
     // To show the Material details when Patron has logged in 
     useEffect(()=>{
-        const ff = async ()=>{
-            await onSnapshot(collection(db,"Material"), (qSnapshot)=>{
-                setMaterialResult(
+        const getAllMaterials = async ()=>{
+            // await onSnapshot(collection(db,"Material"), (qSnapshot)=>{
+            //     let materials =
+            //         qSnapshot.docs.map((docMaterial)=>({
+            //             m_id    : docMaterial.id,
+            //             m_author : docMaterial.data().m_author,
+            //             m_title : docMaterial.data().m_title,
+            //             m_copies : docMaterial.data().m_copies,
+            //             m_dept : docMaterial.data().m_dept,
+            //             m_pub_date : docMaterial.data().m_pub_date
+            //         }))
+            //         console.log('MATERIALS\t', materials)
+            //     setMaterialResult(materials)
+            // })
+            await getDocs(colRefMaterial).then( (qSnapshot)=>{
+
+                let materials =
                     qSnapshot.docs.map((docMaterial)=>({
-                        material_id : docMaterial.id,
-                        material_title : docMaterial.data().material_title,
-                        material_copies : docMaterial.data().material_copies,
-                        material_description : docMaterial.data().material_description
+                        m_id        : docMaterial.id,
+                        m_author    : docMaterial.data().m_author,
+                        m_title     : docMaterial.data().m_title,
+                        m_copies    : docMaterial.data().m_copies,
+                        m_dept      : docMaterial.data().m_dept,
+                        m_pub_date  : docMaterial.data().m_pub_date
                     }))
-                )
+                    console.log('MATERIALS\t', materials)
+                setMaterialResult(materials)
+                setTestReadCounts(testReadCounts+1)
+                alert('read count '+testReadCounts)
             })
+
         }
-        ff()
+        getAllMaterials()
+        
     },[])
+
+    useEffect(()=>{
+        console.log('MATERIALResult state\t', materialResult)
+        searchQ(props.college)
+    },[materialResult])
 
     // Borrow Function to SHOW INFORMATION about the book and the updated copies when borrowed by a patron
     const getInfo = async (bId, title) => { // bId = Material ID that the patron borrowed
+        alert("get info function called")
         let copies = 0
         let dateToday = new Date()
         let dateTomorrow = new Date()
@@ -58,7 +85,7 @@ function BooksList(props) {
         //Get current copies from Material collection 
         // so that you will know what value to decrease
         await getDoc(doc(db, "Material", bId)).then((doc)=> {
-            copies = parseInt(parseInt(doc.data().material_copies))
+            copies = doc.data().m_copies
             console.log("When BORROW btn clicked, the copies before are ", copies)
         })
 
@@ -66,16 +93,16 @@ function BooksList(props) {
         if(copies > 0){
             //When borrower has confirmed, specified material data must decrease to 1
             await updateDoc(doc(db, "Material", bId), {
-                material_copies: (copies-1)
+                m_copies: (copies-1)
             })
             
             // Add the necessary fields to Issue entity when patron confirmed to borrow a book
             await addDoc(collection(db, "Issue"), {
                 patron_id : activePatronSN,
+                m_id : bId,
+                m_title: title,
                 patron_name : activePatronName,
                 patron_email : activePatronEmail,
-                material_id : bId,
-                material_title: title,
                 issue_status : 'not confirmed',
                 issue_checkout_date : dateToday, //today
                 issue_due : dateTomorrow, // 2days after
@@ -89,34 +116,19 @@ function BooksList(props) {
     }
 
     // Get the Material details in order to initiate a search
-    useEffect(() => {
-        const allMaterials = async () => {
-            setTotalRes([])
-            setSearchRes([])
-            await materialResult.map((idd)=>{
-                onSnapshot(doc(db, "Book", idd.material_id), ((doc)=>{   
-                    let oo = doc.data()
-                    oo.material_id = idd.material_id
-                    oo.material_title = idd.material_title
-                    oo.material_copies = idd.material_copies
-                    oo.material_description = idd.material_description
-                    if(!(searchRes.includes(oo)) && !(totalRes.includes(oo))){
-                        setTotalRes(prev => (prev.concat(oo))) 
-                        setSearchRes(prev => (prev.concat(oo))) 
-                    }
-                }))
-            })
-        }
-        allMaterials()
-    },[materialResult]) 
-
     const searchQ = (val) => {
-        setSearchVal(val)
-        const filteredSearch = totalRes.filter((item)=>{
-            const title = item.material_title.toLowerCase()
-            const desc = item.material_description.toLowerCase()
+        // alert('searchq is ran')
+        setSearchVal(val.toLowerCase())
+
+        const filteredSearch = materialResult.filter((item)=>{
+            const title = item.m_title.toLowerCase()
+            const dept = item.m_dept.toLowerCase()
+            const author = item.m_author.toLowerCase()
+            const pub_date = item.m_pub_date.toString()
             return  title.includes(searchVal.toLowerCase()) || 
-                    desc.includes(searchVal.toLowerCase())
+                    dept.includes(searchVal.toLowerCase()) || 
+                    author.includes(searchVal.toLowerCase()) || 
+                    pub_date.includes(searchVal.toLowerCase())
         })
         setSearchRes(filteredSearch)
     }
@@ -127,7 +139,7 @@ function BooksList(props) {
 
     return (
         <>
-        <div>
+        <div>                                                                   
             <Container fluid='true' className="head-search">
                 <Grid className="hs">
                     <Grid.Col span={5} className="welcome-msg">
@@ -171,12 +183,11 @@ function BooksList(props) {
                         return (
                             <>
                                 <Grid.Col span={4} className="BookSection">
-                                    <p> Book ISBN:          <strong>{doc.book_isbn}</strong><br/>
-                                        Book Title:         <strong>{doc.material_title}</strong><br/>
-                                        Book Description:   <strong>{doc.material_description}</strong><br/>
-                                        Copies:             <strong>{doc.material_copies}</strong><br/>
+                                    <p> Author:            <strong>{doc.m_author}</strong><br/>
+                                        Title:             <strong>{doc.m_title}</strong><br/>
+                                        Year Published:    <strong>{doc.m_pub_date}</strong><br/>
                                     </p>
-                                    <button onClick={()=>getInfo(doc.material_id, doc.material_title)} disabled={disableWhenZero(doc.material_copies)}>BORROW</button>
+                                    <button onClick={() => getInfo(doc.m_id, doc.m_title)} disabled={disableWhenZero(doc.m_copies)}>BORROW</button>
                                 </Grid.Col>
                             </>
                         );
@@ -189,4 +200,4 @@ function BooksList(props) {
     );
 }
 
-export default BooksList;
+export default BookList;

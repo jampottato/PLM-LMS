@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import StdNav from '../Components/StdNav';
 import Footer from "../Components/Footer";
 import "../Styles/StdHome.css"
-import BooksList from "../Components/BookList";
+import BookList from "../Components/BookList";
 import BorrowRecord from "../Components/BorrowRecord";
 
 import { addDoc, collection, query, where, getDocs, setDoc, doc } from "firebase/firestore";
@@ -124,6 +124,8 @@ function StdHome() {
             if(doc.data().is_completed == true){
               // console.log('is completed true')
               setPN(doc.data().patron_id)
+              setCollege(doc.data().college)
+              localStorage.setItem('college', doc.data().college)
               // localStorage.setItem("pn", pn)
               setOpen(false);
             } else {
@@ -297,7 +299,7 @@ function StdHome() {
     <div className='Body'>
       <StdNav/>
       <>
-        <BooksList activePID={pn}/>
+        <BookList activePID={pn} college={college}/>
       </>
       <>
 				<BorrowRecord/>
