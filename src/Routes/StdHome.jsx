@@ -88,55 +88,41 @@ function StdHome() {
     "Bachelor of Science in Tourism Management - BSTM"
   ]
 
+  const colleges = ['CET','PLMBS','CN', 'COS', 'CHASS', 'COL', 'CAUP', 'CPT', 'Educ']
   const [activePatronEmail, setActivePatronEmail] = useState(localStorage.getItem('email'))
 
   var user = auth.currentUser;
-  // console.log('Value of em')
-  // console.log(em)
+
   console.log('FIRST\t' + pn)
   const confirmEnteredData = query(collection(db, "UserData"), where("patron_email", "==", activePatronEmail))
-  // console.log('confirmEnteredData EMAIL')
-  // console.log(em)
-  // if (user != null) {
-  //   console.log(user.email)
-  // }
-  // console.log('-----------------')
+  
 
   useEffect(()=>{
     if(user == null){
-      // alert('NULL')
     } else {
-        // alert(user.email)   
         setActivePatronEmail(user.email)
     }
   },[user])
+
     // Check if the user has already ENTERED DATA completely
     // if yes : no need for modal
     // if no : show modal
     const snapshotQuery = async () => {
+      //Query result from UserData
       await getDocs(confirmEnteredData).then((v) => {
         console.log('Entered here')
-        // alert('active email'+activePatronEmail)
         if(v.size > 0){
           v.forEach((doc)=>{
-            // console.log("snapShotQuery")
-            // console.log(doc.data())
             if(doc.data().is_completed == true){
-              // console.log('is completed true')
+              // query to set the needed PATRON details
               setPN(doc.data().patron_id)
               setCollege(doc.data().college)
-              localStorage.setItem('college', doc.data().college)
-              // localStorage.setItem("pn", pn)
               setOpen(false);
             } else {
-              // console.log('is completed false')
               setOpen(true)
             } 
           })
         } else {
-          // console.log('query 0 or -1')
-          // console.log(v.size)
-          // console.log('--------------')
           setOpen(true)
         }
       })
@@ -147,9 +133,8 @@ function StdHome() {
     setPN(val.replace(/\D/g, ''))
   }
 
-  console.log('SECOND\t' + pn)
+  
 
-  const colleges = ['CET','PLMBS','CN', 'COS', 'CHASS', 'COL', 'CAUP', 'CPT', 'Educ']
 
   const handleClose = async (event) => {
     if(pn.length == 9) {
@@ -169,11 +154,7 @@ function StdHome() {
         patron_id:pn,
         is_completed:true
       })
-
-      // ERROR HERE : FIX THIS BUG
-      alert(activePatronEmail)
       
-      console.log("DONE ADDING PN", pn)
       setOpen(false);
       window.location.reload()
     } else {

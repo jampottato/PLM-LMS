@@ -33,16 +33,24 @@ function Admin() {
     const [searchRes, setSearchRes] = useState([])
     const [searchVal, setSearchVal] = useState("")
 
+    const [currentDate, setCurrentDate] = useState()
+
+    // Fetch the Universal Time to det the date and time to only one source and sync 
     useEffect(() => {
-        // alert('SPECIFIC RESULT CHANGED 1')
+        fetch("http://worldtimeapi.org/api/timezone/Asia/Manila").then( res => {
+            res.text().then( val => {
+                const toObj = JSON.parse(val) 
+                const newDate = new Date(toObj.datetime)
+                setCurrentDate(newDate)
+                
+            })
+        })
+    },[])
+
+    useEffect(() => {
         setSearchRes(specificResult)
-        // alert(searchRes)
-        // console.log('SEARCH RESULT')
-        // console.log(searchRes)
     }, [specificResult]);
 
-
-    
     useEffect(()=>{
         const borrowed = async () => {
             await getDocs(colRefIssue).then( res => {
@@ -99,19 +107,16 @@ function Admin() {
                     issue_status: status,
                     issue_due: dateDue
                 }).then(()=>{
-                    // alert("SUCCESFFULLY CONFIRMED")
                     window.location.reload(false);
                 })
             } else if(status == 'returned'){
                 var answer = prompt('Are you sure to return this?')
-                alert('your anwer:'+(answer=='yes'))
                 if(answer == 'yes'){
                     await deleteDoc(doc(db, "Issue", activeIssue))
                     // add one to the book you have
                     await updateDoc(doc(db,'Material',activeMaterial),{
                         material_copies:increment(1)
                     })
-                    alert('it ran')
                 } else {
                     alert('You have cancelled to return the book')
                 }
@@ -151,8 +156,6 @@ function Admin() {
     useEffect(()=>{
         const specResult = async () => {
             setSpecResult([])
-            console.log('spec result length')
-            console.log(specificResult.length)
             await issueResult.map((idd)=>{
                 let res = {}
                 const specificMat = getDoc(doc(db, "Material", idd.m_id)) 
@@ -161,48 +164,57 @@ function Admin() {
                     //check if the date in DB is confirmed by admin
                     res.issue_status = ll("confirmed", idd.issue_id, idd.m_id)
 
-                    let dateToday = new Date()
+                    let dateToday = currentDate
 
                     const timeDue = idd.issue_due.toDate().toLocaleDateString('en-US') + " " + idd.issue_due.toDate().toLocaleTimeString('en-US')
                     res.issue_due = timeDue
 
-                    //count cost
+                    //Count penalty if the days are in the same month
                     let times = Math.abs(dateToday.getDate() - idd.issue_due.toDate().getDate())
 
                     let counter = 0
-                    let iMonth = idd.issue_due.toDate().getMonth()+1
-                    let iDate = idd.issue_due.toDate().getDate()
-                    let iYear = idd.issue_due.toDate().getFullYear()
-                    let iDateF = iMonth + '-' + iDate + '-' + iYear;
+                    let issueMonth = idd.issue_due.toDate().getMonth()+1
+                    let issueDate = idd.issue_due.toDate().getDate()
+                    let issueYear = idd.issue_due.toDate().getFullYear()
+                    let issueDateFormat = issueMonth + '-' + issueDate + '-' + issueYear;
 
-                    let tMonth = dateToday.getMonth()+1
-                    let tDate = dateToday.getDate()
-                    let tYear = dateToday.getFullYear()
-                    let tDateF = tMonth + '-' + tDate + '-' + tYear;
+                    let todayMonth = dateToday.getMonth()+1
+                    let todayDate = dateToday.getDate()
+                    let todayYear = dateToday.getFullYear()
+                    let todayDateFormat = todayMonth + '-' + todayDate + '-' + todayYear;
 
-                    if((tMonth -  iMonth) > 0) {
-                        while(iDateF != tDateF){
+                    //Count penalty to check if the days are not in the same month
+                    //  if it is not in the same month, the {times} will be changed in the value of {counter}
+                    //  exampel: (April - March) = (4 - 3) = 1
+                    if((todayMonth -  issueMonth) > 0) {
+
+                        //Iterate the issue due date until it is equal to today's date 
+                        //  counting the number of days to penalize
+                        while(issueDateFormat != todayDateFormat){
                             dateToday.setDate(dateToday.getDate() - 1)
-
-                            tMonth = dateToday.getMonth()+1
-                            tDate = dateToday.getDate()
-                            tYear = dateToday.getFullYear()
-                            tDateF = tMonth + '-' + tDate + '-' + tYear;
+                            todayMonth = dateToday.getMonth()+1
+                            todayDate = dateToday.getDate()
+                            todayYear = dateToday.getFullYear()
+                            todayDateFormat = todayMonth + '-' + todayDate + '-' + todayYear;
                            
                             counter+=1
                         }
-                    }
-                    times = counter
+                        times = counter
+                    } 
 
+                    // Assign the penalty value calculated accdg. to the calculation above
                     if(idd.issue_due.toDate() < dateToday){
                         res.issue_fine = times*parseInt(50)
                         updateDoc(doc(db, "Issue", idd.issue_id),{
                             issue_fine: times*parseInt(50)
                         })
-                    } else {
+                    } 
+                    else {
                         res.issue_fine = 0
                     }
-                } else {
+
+                } 
+                else {
                     res.issue_status = ll("not confirmed", idd.issue_id, idd.m_id)
                 }
                 
@@ -210,21 +222,12 @@ function Admin() {
 
                 specificMat.then((doc)=>{
                     res = Object.assign(res, doc.data())   
-                    // alert('Material Result')
-                    // console.log(res)
 
-                    //fix this by finding out the duplicating problem... then remove this logic
+                    // To avoid duplicating results
                     if(!(specificResult.includes(res))){
                         setSpecResult(prev => (prev.concat(res)))  
-
-                        // setSearchRes(prev => (prev.concat(res)))
                     }
-                    
                 })
-
-                console.log('specific result')
-                console.log(specificResult)
-                
             })
         }
         specResult()
@@ -235,7 +238,6 @@ function Admin() {
 
     const noRefresh = (event) => {
         event.preventDefault();
-        // searchQ
     }
 
     const searchQ = (val) => {
@@ -254,17 +256,15 @@ function Admin() {
         })
         
         setSearchRes(filterSearch)
-        alert(filterSearch)
     }
 
-
     const [columns] = useState([
-        { name: 'patron_id', title: 'ID' },
-        { name: 'patron_name', title: 'NAME' },
-        { name: 'm_title', title: 'TITLE' },
-        { name: 'issue_due', title: 'DUE' },
-        { name: 'issue_fine', title: 'PENALTY' },
-        { name: 'issue_status', title: 'STATUS' },
+        { name: 'patron_id',        title: 'ID' },
+        { name: 'patron_name',      title: 'NAME' },
+        { name: 'm_title',          title: 'TITLE' },
+        { name: 'issue_due',        title: 'DUE' },
+        { name: 'issue_fine',       title: 'PENALTY' },
+        { name: 'issue_status',     title: 'STATUS' },
     ]);
 
     const apptABT = () => {
@@ -320,8 +320,6 @@ function Admin() {
             </Grid>
         </Container>
 
-
-        {/* //abt */}
         <AdminBorrowTable       hide={hiddRese} searchValue={searchRes} admin_columns={columns}/>
         <AdminAppointmentTable  hide={hiddAppt}/>
 

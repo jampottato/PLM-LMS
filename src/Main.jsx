@@ -28,7 +28,7 @@ function Main() {
       <Route path="/@!" element={<Admin/>}/>
       {/* <Route path="/ftest" element={<FTest/>}/>
       <Route path="/adbtest" element={<AdminBorrowTable/>}/> */}
-      {/* <Route path="/sets" element={<SetAllCopies/>}/> */}
+      <Route path="/sets" element={<SetAllCopies/>}/>
       {/* <Route path="/adds" element={<AddAllMat/>}/> */}
     </Routes>
    </Router>

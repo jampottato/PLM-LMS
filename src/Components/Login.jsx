@@ -35,10 +35,11 @@ function Login() {
             }
             return result.user;
             
-          }).then((v)=>{alert(v.email)})
-        .catch((error) => {
-          alert(error.message);
-        });
+          })
+          // .then((v)=>{alert(v.email)})
+          .catch((error) => {
+            // alert(error.message);
+          });
     };
   
     return (

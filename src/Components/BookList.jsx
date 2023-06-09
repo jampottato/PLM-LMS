@@ -2,122 +2,121 @@ import {useState, useEffect} from "react";
 import {db} from "../Database/firebase-config";
 import "../Styles/BookList.css";
 
-import { Button, Flex, Grid, Input} from '@mantine/core';
-import { IconSearch } from "@tabler/icons-react";
+import { Button, Grid} from '@mantine/core';
 import { Container } from "react-bootstrap";
 
-import {doc, query, collection, onSnapshot, getDoc, addDoc, updateDoc, getDocs} from "firebase/firestore";
+import {doc, collection, getDoc, addDoc, updateDoc, getDocs, Timestamp} from "firebase/firestore";
+
+import BookListBorrowComp from './BooksListBorrowComp';
 
 
 function BookList(props) {
-    let activePatronEmail = localStorage.getItem("email");
-    let activePatronName = localStorage.getItem("name");
-    // let activePatronSN = localStorage.getItem("pn");
-    let activePatronSN = props.activePID
+    // Get these email, name, and idNumber for us to identify who is going to reserve some books 
+    let activePatronEmail = localStorage.getItem("email");  // They are in a localStorage because we want to get the
+    let activePatronName = localStorage.getItem("name");    // current LOGGED IN user (available info only are those)
+    
+    let activePID = props.activePID;                    // Patron ID is provided when the user has already entered data
+                                                        // and it is retrieved from UserData collection
+    
+    //DB REFERENCES
+    const colRefMaterial = collection(db, "Material")
+
     //MATERIAL DETAILS
-    const [searchRes, setSearchRes] = useState([])
-    const [materialResult, setMaterialResult] = useState([])
+    const [searchRes, setSearchRes] = useState([])              // It is the result {} for the searched value
+    const [materialResult, setMaterialResult] = useState([])    // The result for the Materials collection
     
     //SEARCH VALUE
-    const [searchVal, setSearchVal] = useState(localStorage.getItem('college'))
-    //college my b emt
+    const [searchVal, setSearchVal] = useState(localStorage.getItem('college')) // The default search value is the department of the patron
     
-    //REFERENCES
-    const colRefMaterial = collection(db, "Material")
 
     // Disable the borrow button when the copies of book are 0 
     const disableWhenZero = (val) => {
         return parseInt(val) > 0 ? false : true
     }
 
-    const [testReadCounts, setTestReadCounts] = useState(0)
-    // To show the Material details when Patron has logged in 
+    //PATRONS' Reserve Function (reserve button)
+    const getInfo = async (bId, title) => { // bId = Material ID that the patron borrowed
+        let copies = 0
+        let dateToday = new Date()
+        let dateDue = new Date()
+        dateDue.setDate(dateToday.getDate()+2) //+2 means that the borrow days should be max of 2 days only
+
+        //Get current copies from Material collection 
+        // so that you will know what value to decrease
+        await getDoc(doc(db, "Material", bId)).then((doc)=> {
+            copies = doc.data().m_copies
+        })
+
+        //Adding of items in ISSUE entity when the patron wants to reserve a book
+        if(copies > 0){
+
+            //Check if there is a patron ID
+            if(!(activePID == null || activePID == '')){
+                //When the patron has confirmed, specified material data must decrease to 1
+                await updateDoc(doc(db, "Material", bId), {
+                    m_copies: (copies-1)
+                })
+
+                // Add the necessary fields to Issue entity when patron confirmed to borrow a book
+                await addDoc(collection(db, "Issue"), {
+                    patron_id : activePID,
+                    m_id : bId,
+                    m_title: title,
+                    patron_name : activePatronName,
+                    patron_email : activePatronEmail,
+                    issue_status : 'not confirmed',
+                    issue_checkout_date : dateToday, //today
+                    issue_due : dateDue, // 2days after
+                    issue_fine : 0 // 0
+                }).then(
+                    alert('You have reserved a book. Come to the library to borrow the material.')
+                ).then(
+                    window.location.reload(false)
+                )
+            } else {
+                alert('There is no patron ID: ', activePID)
+            }
+            
+        } 
+        else {
+            // TODO: Change this with a modal
+            alert("There are 0 copies, you could not borrow this")
+        }
+    }
+
+    const reserveBtn = (mid, mtitle, mcopies) => {
+        return (
+            <Button style={{display:"inline-block",margin:0,padding:"0 30px 0 30px",maxWidth:'100%'}} onClick={() => getInfo(mid, mtitle)} disabled={disableWhenZero(mcopies)}>RESERVE</Button>
+        )
+    }
+
     useEffect(()=>{
         const getAllMaterials = async ()=>{
-            // await onSnapshot(collection(db,"Material"), (qSnapshot)=>{
-            //     let materials =
-            //         qSnapshot.docs.map((docMaterial)=>({
-            //             m_id    : docMaterial.id,
-            //             m_author : docMaterial.data().m_author,
-            //             m_title : docMaterial.data().m_title,
-            //             m_copies : docMaterial.data().m_copies,
-            //             m_dept : docMaterial.data().m_dept,
-            //             m_pub_date : docMaterial.data().m_pub_date
-            //         }))
-            //         console.log('MATERIALS\t', materials)
-            //     setMaterialResult(materials)
-            // })
             await getDocs(colRefMaterial).then( (qSnapshot)=>{
-
                 let materials =
                     qSnapshot.docs.map((docMaterial)=>({
                         m_id        : docMaterial.id,
                         m_author    : docMaterial.data().m_author,
                         m_title     : docMaterial.data().m_title,
                         m_copies    : docMaterial.data().m_copies,
-                        m_dept      : docMaterial.data().m_dept,
-                        m_pub_date  : docMaterial.data().m_pub_date
+                        m_dept      : docMaterial.data().m_dept, 
+                        m_pub_date  : docMaterial.data().m_pub_date,
+                        m_btn       : reserveBtn(docMaterial.id,docMaterial.data().m_title,docMaterial.data().m_copies)
                     }))
-                    console.log('MATERIALS\t', materials)
                 setMaterialResult(materials)
-                setTestReadCounts(testReadCounts+1)
-                alert('read count '+testReadCounts)
             })
-
         }
         getAllMaterials()
-        
     },[])
 
+    // It serves as the initiator for the contents of the books in the patron landing page after log in
+    // It initiates the SEARCH VALUE into the department they are currently in
     useEffect(()=>{
-        console.log('MATERIALResult state\t', materialResult)
         searchQ(props.college)
     },[materialResult])
 
-    // Borrow Function to SHOW INFORMATION about the book and the updated copies when borrowed by a patron
-    const getInfo = async (bId, title) => { // bId = Material ID that the patron borrowed
-        alert("get info function called")
-        let copies = 0
-        let dateToday = new Date()
-        let dateTomorrow = new Date()
-        dateTomorrow.setDate(dateToday.getDate()+2) //+2 means that the borrow days should be max of 2 days only
-
-        //Get current copies from Material collection 
-        // so that you will know what value to decrease
-        await getDoc(doc(db, "Material", bId)).then((doc)=> {
-            copies = doc.data().m_copies
-            console.log("When BORROW btn clicked, the copies before are ", copies)
-        })
-
-        //Adding of items in ISSUE entity
-        if(copies > 0){
-            //When borrower has confirmed, specified material data must decrease to 1
-            await updateDoc(doc(db, "Material", bId), {
-                m_copies: (copies-1)
-            })
-            
-            // Add the necessary fields to Issue entity when patron confirmed to borrow a book
-            await addDoc(collection(db, "Issue"), {
-                patron_id : activePatronSN,
-                m_id : bId,
-                m_title: title,
-                patron_name : activePatronName,
-                patron_email : activePatronEmail,
-                issue_status : 'not confirmed',
-                issue_checkout_date : dateToday, //today
-                issue_due : dateTomorrow, // 2days after
-                issue_fine : 0 // 0
-            })
-        } 
-        else {
-            //Create a proper dialogbox here to ask for confirmation of the patron
-            alert("There are 0 copies, you could not borrow this")
-        }
-    }
-
     // Get the Material details in order to initiate a search
     const searchQ = (val) => {
-        // alert('searchq is ran')
         setSearchVal(val.toLowerCase())
 
         const filteredSearch = materialResult.filter((item)=>{
@@ -133,68 +132,28 @@ function BookList(props) {
         setSearchRes(filteredSearch)
     }
 
-    const noRefresh = (event) => {
-        event.preventDefault();
-    }
+    const [columns] = useState([
+        { name: 'm_btn',        title: 'RESERVE' },
+        { name: 'm_title',      title: 'TITLE' },
+        { name: 'm_author',     title: 'AUTHOR' },
+        { name: 'm_pub_date',   title: 'PUBLISHED YEAR' },
+        { name: 'm_dept',       title: 'DEPARTMENT' },
+        { name: 'm_copies',     title: 'COPIES'},
+    ]);
 
     return (
         <>
-        <div>                                                                   
+        <div>
             <Container fluid='true' className="head-search">
                 <Grid className="hs">
                     <Grid.Col span={5} className="welcome-msg">
-                        <h2 className="header-texts"><strong>Welcome, {localStorage.getItem("name")}</strong></h2>
-                        <p className="subheader-texts">STUDENT NUMBER: {activePatronSN}</p>
-                    </Grid.Col>
-
-                    <Grid.Col span={3}></Grid.Col>
-
-                    <Grid.Col span={4} className="search-box">
-                    <Flex direction="row" gap="sm" align="center" justify="center" wrap="wrap">
-                    <form onSubmit={noRefresh} focused="true" target="_self">
-                        <Input
-                            icon={<IconSearch size={25} />}
-                            placeholder="Search"
-                            radius="lg"
-                            className="input-edited"
-                            onChange={e => searchQ(e.target.value)}
-                        />
-                    </form>
-                    </Flex>
-                    </Grid.Col>
-                </Grid>
-            </Container>
-
-            <Container fluid='true' className="head-search">
-                <Grid className="hs">
-                    <Grid.Col span={5} className="welcome-msg">
-                        <h2 className="header-texts"><strong>Results</strong></h2>
+                        <h2 className="header-texts"><strong>Library Materials</strong></h2>
                     </Grid.Col>
                     <Grid.Col span={3}></Grid.Col>
                     <Grid.Col span={4}></Grid.Col>
                 </Grid>
-            </Container>
-
-            <Container fluid='true' className="result">
-                <div className="panel"></div>
-                <div className="searched-content">
-                <Grid>
-                    {searchRes.map((doc)=> {
-                        return (
-                            <>
-                                <Grid.Col span={4} className="BookSection">
-                                    <p> Author:            <strong>{doc.m_author}</strong><br/>
-                                        Title:             <strong>{doc.m_title}</strong><br/>
-                                        Year Published:    <strong>{doc.m_pub_date}</strong><br/>
-                                    </p>
-                                    <button onClick={() => getInfo(doc.m_id, doc.m_title)} disabled={disableWhenZero(doc.m_copies)}>BORROW</button>
-                                </Grid.Col>
-                            </>
-                        );
-                    })}
-                </Grid>
-                </div>
-            </Container>
+            </Container> 
+            <BookListBorrowComp searchValue={searchRes} material_columns={columns}/>
         </div>
         </>
     );
