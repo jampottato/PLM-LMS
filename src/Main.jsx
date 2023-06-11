@@ -7,6 +7,11 @@ import StdHome from "./Routes/StdHome";
 import Tutorial from "./Routes/Tutorial";
 import Homevs from "./Routes/Homevs";
 import EnterInfo from "./Routes/EnterInfo";
+import Admin from "./Routes/Admin";
+import FTest from "./Routes/FTest";
+import AdminBorrowTable from "./Routes/AdminBorrowTable";
+import SetAllCopies from "./Routes/set_all_copies";
+import AddAllMat from "./Routes/add_all_records";
 
 function Main() {
   return (
@@ -20,6 +25,11 @@ function Main() {
       <Route path="/StdHome" element={<StdHome/>}/>
       <Route path="/Homevs" element={<Homevs/>}/>
       <Route path="/EnterInfo" element={<EnterInfo/>}/>
+      <Route path="/@!" element={<Admin/>}/>
+      {/* <Route path="/ftest" element={<FTest/>}/>
+      <Route path="/adbtest" element={<AdminBorrowTable/>}/> */}
+      <Route path="/sets" element={<SetAllCopies/>}/>
+      {/* <Route path="/adds" element={<AddAllMat/>}/> */}
     </Routes>
    </Router>
   );

@@ -1,31 +1,49 @@
 import React from "react";
 import Button from 'react-bootstrap/Button';
 import { BsMicrosoft } from "react-icons/bs";
-import { signInWithMicrosoft } from "../Database/firebase-config"
-import { useNavigate } from "react-router-dom";
+import { signInWithMicrosoft, auth } from "../Database/firebase-config"
+import { Router, useNavigate } from "react-router-dom";
 import EnterInfo from "../Routes/EnterInfo";
-
 function Login() {
-    
-    const navigate = useNavigate()
-    const login = async () => {
-      await signInWithMicrosoft()
-        .then((result) =>{ 
-            console.log("HERE IS ITSHSHSHHSHSHS")
-            console.log(result);
-            localStorage.setItem('name', result.user.displayName);
-            localStorage.setItem('email', result.user.email);
-            navigate('/StdHome')
-            
-          })
-        .catch((error) => {
-            console.log(error.message);
-        });
-    };
-  
-    return (
-        <Button onClick={login} variant="dark">Login with Microsoft</Button>
-    );
-  }
-  
-  export default Login;
+	
+
+	
+	function containsNumbers(str) {
+		return /[0-9]/.test(str);
+	}
+	
+	const navigate = useNavigate()
+	const login = async () => {
+		await signInWithMicrosoft()
+			.then((result) =>{ 
+				// add the data of the logged in account in USERDATA
+				// notify the home that the active account is the user logged in
+
+				localStorage.clear();
+				localStorage.setItem('name', result.user.displayName);
+				localStorage.setItem('email', result.user.email);
+
+				console.log('GO BEFORE ANYTHING')
+				// For testing purposes, it is set to 0, set to 1 for production
+				if (containsNumbers(result.user.email) == 1 ){
+					console.log('GO TO HOME')
+					navigate('/StdHome')
+				} else {
+					console.log('GO TO ADMIN')
+					navigate('/Admin')
+				}
+				return result.user;
+				
+			})
+			// .then((v)=>{alert(v.email)})
+			.catch((error) => {
+				// alert(error.message);
+			});
+	};
+
+	return (
+			<Button onClick={login} variant="dark">Login with Microsoft</Button>
+	);
+}
+	
+	export default Login;
