@@ -127,7 +127,6 @@ function Admin() {
         updateConfirmedMat()
     }, [status])
 
-
     const ll = (val, issueID, matID) => {
         if(val == "confirmed") {
             return (

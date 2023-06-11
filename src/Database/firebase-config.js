@@ -15,7 +15,6 @@ const firebaseConfig = {
   messagingSenderId: "756504720193",
   appId: "1:756504720193:web:4dea4935e9b1aa09f367c0",
   measurementId: "G-W85R65CL61"
-
 };
 
 const app = initializeApp(firebaseConfig);
@@ -28,7 +27,7 @@ export const signInWithMicrosoft = async () =>
     auth,
     provider.setCustomParameters({
       prompt: "consent",
-      login_hint: "user2020@plm.edu.ph",
+      login_hint: "",
       tenant: "c83f55a7-7fe8-4934-b759-09926430aef0",
       //       c83f55a7-7fe8-4934-b759-09926430aef0
     })

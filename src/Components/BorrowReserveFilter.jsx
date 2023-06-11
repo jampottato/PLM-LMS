@@ -6,8 +6,10 @@ import '../Styles/BorrowRecord.css';
 import { Grid, Table } from "@mantine/core";
 import BorrowRecordComp from "./BorrowRecordComp";
 
-function BorrowRecord() {
+function BorrowReserveFilter() {
     const [issueResult, setIssueResult] = useState([])
+    const [borrowResult, setBorrowResult] = useState([])
+    const [reserveResult, setReserveResult] = useState([])
     const [activePatronEmail, setActivePatronEmail] = useState('')
     const colRefIssue = collection(db, "Issue")
     var user = auth.currentUser;
@@ -64,6 +66,10 @@ function BorrowRecord() {
         borrowed()
     }, [activePatronEmail])
 
+    useEffect(() => {
+
+    }, [issueResult])
+
 
     const [columns] = useState([
         {name : 'm_title',      title : 'MATERIAL TITLE'},
@@ -92,4 +98,4 @@ function BorrowRecord() {
     );
 }
 
-export default BorrowRecord;
+export default BorrowReserveFilter;

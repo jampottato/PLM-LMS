@@ -1,5 +1,5 @@
 import '../Styles/Home.css';
-import {BrowserRouter as Router, Routes, Route, Link} from "react-router-dom";
+import {BrowserRouter as Router, Routes, Route, Link, useNavigate} from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.css'
 import { Nav, Navbar} from 'react-bootstrap'
 import React, { useState } from 'react';
@@ -10,12 +10,27 @@ import HomeFooter from '../Components/Home-Footer'
 import HomeCarousel from '../Components/Home-Carousel';
 import logo from '../assets/logo.png';
 import fire from  '../assets/fire.jpg';;
+import { auth } from '../Database/firebase-config';
+import { useEffect } from 'react';
 
 
 function Header() {
+  const navigate = useNavigate();
+  const [showLogin, setShowLogin] = useState(true)
+
+  useEffect(()=>{
+    auth.onAuthStateChanged(user => {
+      if(user != null) {
+        navigate('/StdHome')
+      } else {
+        setShowLogin(false)
+      }
+    })
+  })
+  
 
   return (
-    <div className="App">
+    <div className="App" hidden={showLogin}>
       <Navbar className='Headernav' bg="white" variant="white">
       
         <Navbar.Brand>

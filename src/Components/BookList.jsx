@@ -12,12 +12,11 @@ import BookListBorrowComp from './BooksListBorrowComp';
 
 function BookList(props) {
     // Get these email, name, and idNumber for us to identify who is going to reserve some books 
-    let activePatronEmail = localStorage.getItem("email");  // They are in a localStorage because we want to get the
-    let activePatronName = localStorage.getItem("name");    // current LOGGED IN user (available info only are those)
-    
-    let activePID = props.activePID;                    // Patron ID is provided when the user has already entered data
-                                                        // and it is retrieved from UserData collection
-    
+    let activePatronEmail   =   props.activePatronEmail;          // They are in a localStorage because we want to get the
+    let activePatronName    =   props.name;                       // current LOGGED IN user (available info only are those)
+    let activeIDN           =   props.activePID;                  // Patron ID is provided when the user has already entered data
+                                                                  // and it is retrieved from UserData collection as props in this BookList
+
     //DB REFERENCES
     const colRefMaterial = collection(db, "Material")
 
@@ -49,9 +48,8 @@ function BookList(props) {
 
         //Adding of items in ISSUE entity when the patron wants to reserve a book
         if(copies > 0){
-
             //Check if there is a patron ID
-            if(!(activePID == null || activePID == '')){
+            if(!(activeIDN == null || activeIDN == '')){
                 //When the patron has confirmed, specified material data must decrease to 1
                 await updateDoc(doc(db, "Material", bId), {
                     m_copies: (copies-1)
@@ -59,7 +57,7 @@ function BookList(props) {
 
                 // Add the necessary fields to Issue entity when patron confirmed to borrow a book
                 await addDoc(collection(db, "Issue"), {
-                    patron_id : activePID,
+                    patron_id : activeIDN,
                     m_id : bId,
                     m_title: title,
                     patron_name : activePatronName,
@@ -74,9 +72,8 @@ function BookList(props) {
                     window.location.reload(false)
                 )
             } else {
-                alert('There is no patron ID: ', activePID)
+                console.log('There is no patron ID: ', activeIDN, props.activePID)
             }
-            
         } 
         else {
             // TODO: Change this with a modal
@@ -107,7 +104,7 @@ function BookList(props) {
             })
         }
         getAllMaterials()
-    },[])
+    },[props.activePID])
 
     // It serves as the initiator for the contents of the books in the patron landing page after log in
     // It initiates the SEARCH VALUE into the department they are currently in
