@@ -130,7 +130,7 @@ function BookList(props) {
     }
 
     const [columns] = useState([
-        { name: 'm_btn',        title: 'RESERVE' },
+        { name: 'm_btn',        title: ' ' },
         { name: 'm_title',      title: 'TITLE' },
         { name: 'm_author',     title: 'AUTHOR' },
         { name: 'm_pub_date',   title: 'PUBLISHED YEAR' },

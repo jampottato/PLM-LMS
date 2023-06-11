@@ -1,5 +1,5 @@
 import {useState, useEffect} from "react";
-import '../Styles/Admin.css';
+import '../../Styles/Admin.css';
 
 import Paper from '@mui/material/Paper';
 import {
@@ -20,7 +20,7 @@ import {
 	TableColumnResizing,
 } from '@devexpress/dx-react-grid-material-ui';
 
-function BorrowRecordComp(props) {
+function BorrowComp(props) {
     const tableP = {
         width: '80%',
         margin: '30px auto 20px auto',
@@ -34,10 +34,9 @@ function BorrowRecordComp(props) {
 	const [pSize, setPSize] = useState(5);
 	const [pSizes] = useState([5, 10, 15]);
 	const [defaultColumnWidths] = useState([
-        {columnName : 'm_title', 		width : 300},
-        {columnName : 'issue_due', 		width : 300},
-		{columnName : 'issue_fine', 	width : 300},
-        {columnName : 'issue_status', 	width : 300},
+        {columnName : 'm_title', 		width : 500},
+        {columnName : 'issue_due', 		width : 500},
+		{columnName : 'issue_fine', 	width : 500},
 	]);
 
 	return (
@@ -76,4 +75,4 @@ function BorrowRecordComp(props) {
 	</>
 	);
 }
-export default BorrowRecordComp;
+export default BorrowComp;

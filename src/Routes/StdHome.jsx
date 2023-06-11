@@ -4,7 +4,7 @@ import StdNav from '../Components/StdNav';
 import Footer from "../Components/Footer";
 import "../Styles/StdHome.css"
 import BookList from "../Components/BookList";
-import BorrowRecord from "../Components/BorrowRecord";
+import BorrowReserveFilter from "../Components/BorrowReserve/BorrowReserveFilter";
 
 import { addDoc, collection, query, where, getDocs, setDoc, doc } from "firebase/firestore";
 import { db, auth } from "../Database/firebase-config";
@@ -280,7 +280,7 @@ function StdHome() {
 				<BookList activePID={pn} name={name} activePatronEmail={activePatronEmail} college={college}/>
 			</>
 			<>
-				<BorrowRecord/>
+				<BorrowReserveFilter/>
 			</>
 			<Footer/>
 		</div>
