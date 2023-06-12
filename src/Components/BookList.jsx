@@ -98,17 +98,6 @@ function BookList(props) {
         )
     }
 
-    const textPositioning = (content) => {
-        const noOverflow = {
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'unset',
-          }
-        return (
-            <span style={noOverflow}>{content}</span>
-        )
-    }
-
     // Generate the Materials list
     useEffect(()=>{
         const getAllMaterials = async ()=>{
@@ -121,6 +110,7 @@ function BookList(props) {
                         m_copies    : docMaterial.data().m_copies,
                         m_dept      : docMaterial.data().m_dept, 
                         m_pub_date  : docMaterial.data().m_pub_date,
+                        m_call_num  : docMaterial.data().m_call_num,
                         m_btn       : reserveBtn(docMaterial.id,docMaterial.data().m_title,docMaterial.data().m_copies),
                         m_more_info : moreInfo( docMaterial.data().m_title, 
                                                 docMaterial.data().m_author,
@@ -160,9 +150,10 @@ function BookList(props) {
 
     const [columns] = useState([
         { name: 'm_btn',        title: ' ' },
+        { name: 'm_call_num',   title: 'CALL NUM' },
         { name: 'm_title',      title: 'TITLE' },
         { name: 'm_author',     title: 'AUTHOR' },
-        { name: 'm_dept',       title: 'DEPARTMENT' },
+        { name: 'm_dept',     title: 'DEPARTMENT' },
         { name: 'm_copies',     title: 'COPIES'},
         { name: 'm_more_info',     title: ' '},
     ]);

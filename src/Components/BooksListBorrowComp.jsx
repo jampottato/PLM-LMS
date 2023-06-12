@@ -37,14 +37,6 @@ function BoksListBorrowComp(props) {
 	const [currentPage, setCurrentPage] = useState(0);
 	const [pSize, setPSize] = useState(5);
 	const [pSizes] = useState([5, 10, 15]);
-	const [defaultColumnWidths] = useState([
-		{ columnName: 'm_btn', width: 300 },
-		{ columnName: 'm_title', width: 400 },
-		{ columnName: 'm_author', width: 300 },
-		{ columnName: 'm_dept', width: 200 },
-        { columnName: 'm_copies', width: 200},
-		{ columnName: 'm_more_info',     width: 200}
-	]);
 
 	const HeaderCell = ({ value, style, ...restProps }) => (
 		<TableHeaderRow.Cell
@@ -52,6 +44,7 @@ function BoksListBorrowComp(props) {
 		  style={{
 			...style,
 			textAlign : 'center',
+			
 		  }}
 		/>
 	  );
@@ -66,7 +59,7 @@ function BoksListBorrowComp(props) {
 			...style,
 			whiteSpace: 'normal',  
     		wordWrap: 'break-word',
-			border: '1px solid black 0.5',
+			border: '1px solid rgba(0,0,0,0.1)',
 			textAlign : 'center'
 		  }}
 		>
@@ -78,12 +71,6 @@ function BoksListBorrowComp(props) {
 		return <HighlightedCell {...props} />;
 	  };
 
-	  const [tableColumnExtensions] = useState([
-		{ columnName: 'm_title', wordWrapEnabled: true },
-		{ columnName: 'm_author', wordWrapEnabled: true },
-		{ columnName: 'm_dept', wordWrapEnabled: true },
-        { columnName: 'm_copies', wordWrapEnabled: true},
-	  ]);
 
 	return (
 	<>

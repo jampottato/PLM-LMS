@@ -18,6 +18,7 @@ import {
 	Toolbar,
 	SearchPanel,
 	TableColumnResizing,
+	TableFixedColumns,
 } from '@devexpress/dx-react-grid-material-ui';
 
 function ReserveComp(props) {
@@ -30,12 +31,41 @@ function ReserveComp(props) {
         textalign: 'center',
     };
 
+	const HeaderCell = ({ value, style, ...restProps }) => (
+		<TableHeaderRow.Cell
+		  {...restProps}
+		  style={{
+			...style,
+			textAlign : 'center',
+		  }}
+		/>
+	  );
+	const HeadStyle = (props)=>{
+		return <HeaderCell {...props}/>
+	}
+
+	const HighlightedCell = ({ value, style, ...restProps }) => (
+		<Table.Cell
+		  {...restProps}
+		  style={{
+			...style,
+			whiteSpace: 'normal',  
+    		wordWrap: 'break-word',
+			border: '1px solid rgba(0,0,0,0.1)',
+			textAlign : 'center'
+		  }}
+		>
+			{value}
+		</Table.Cell>
+	);
+	
+	const Cell = (props) => {
+	return <HighlightedCell {...props} />;
+	};
+
 	const [currentPage, setCurrentPage] = useState(0);
 	const [pSize, setPSize] = useState(5);
 	const [pSizes] = useState([5, 10, 15]);
-	const [defaultColumnWidths] = useState([
-        {columnName : 'm_title', 		width : 500},
-	]);
 
 	return (
 	<>
@@ -59,9 +89,10 @@ function ReserveComp(props) {
 				defaultSorting={[{ columnName: 'issue_due', direction: 'asc' }]}
 			/>
 			<IntegratedSorting />
-			<Table />
-			<TableColumnResizing defaultColumnWidths={defaultColumnWidths} />
-			<TableHeaderRow showSortingControls />
+			<Table cellComponent={Cell} />
+			
+			<TableColumnResizing />
+			<TableHeaderRow showSortingControls cellComponent={HeadStyle}/>
 			<Toolbar />
 			
 			<SearchPanel style={{width:'100%'}}/>

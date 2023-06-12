@@ -2,7 +2,7 @@ import {useState, useEffect} from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { Button, Modal , Group, ScrollArea, Stack, Container, Grid, Center, Paper} from '@mantine/core';
 
-function MoreInfo(props) {
+function MoreInfoReserve(props) {
     const [opened, { open, close }] = useDisclosure(false)
     const genericStyle = {
         borderColor : '#1c7ed6',
@@ -23,6 +23,7 @@ function MoreInfo(props) {
             </>
         )
     }
+    
 
     return (
         <div style={buttonPosition}>
@@ -44,28 +45,32 @@ function MoreInfo(props) {
                 <Stack>
                     <Group grow position='center'>
                         <Container align='center' style={genericStyle}>
-                            <p><span style={{fontWeight:'bold'}}>Title</span></p>
-                            <p>{props.title}</p>
+                            <p><span style={{fontWeight:'bold'}}>Call Number</span></p>
+                            <p>{props.dataHere.m_call_num}</p>
                         </Container>
                     </Group>
                     <Group grow position='center'>
                         <Container align='center' style={genericStyle}>
+                            <p><span style={{fontWeight:'bold'}}>Title</span></p>
+                            <p>{props.dataHere.m_title}</p>
+                        </Container>
+                        <Container align='center' style={genericStyle}>
                             <p><span style={{fontWeight:'bold'}}>Author</span></p>
-                            <p>{props.author}</p>
+                            <p>{props.dataHere.m_author}</p>
                         </Container>
                     </Group>
                     <Group grow position='center'>
                         <Container align='center' style={genericStyle}>
                             <p><span style={{fontWeight:'bold'}}>Department</span></p>
-                            <p>{props.department}</p>
+                            <p>{props.dataHere.m_dept}</p>
                         </Container>
                         <Container align='center' style={genericStyle}>
                             <p><span style={{fontWeight:'bold'}}>Published Year</span></p>
-                            <p>{props.pubYear}</p>
+                            <p>{props.dataHere.m_pub_date}</p>
                         </Container>
                         <Container align='center' style={genericStyle}>
                             <p><span style={{fontWeight:'bold'}}>Available Copies</span></p>
-                            <p>{props.copies}</p>
+                            <p>{props.dataHere.m_copies}</p>
                         </Container>
                     </Group>
                 </Stack>
@@ -73,4 +78,4 @@ function MoreInfo(props) {
         </div>
         )
 }
-export default MoreInfo;
+export default MoreInfoReserve;

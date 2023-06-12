@@ -1,11 +1,13 @@
 import {useState, useEffect} from "react";
 import {db, auth} from "../../Database/firebase-config";
-import {query, collection, where, getDocs} from "firebase/firestore";
+import {query, collection, where, getDocs, doc, getDoc} from "firebase/firestore";
 import { Container } from "react-bootstrap";
 import '../../Styles/BorrowRecord.css';
 import { Grid, Table } from "@mantine/core";
 import BorrowComp from "./BorrowComp";
 import ReserveComp from "./ReserveComp";
+import MoreInfo from "../MoreInfo";
+import MoreInfoReserve from "./MoreInfoReserve";
 
 
 function BorrowReserveFilter() {
@@ -25,6 +27,13 @@ function BorrowReserveFilter() {
         }
     },[user])
 
+    // More details BTN
+    const moreInfoReserve = (dataHere) => {
+        return (
+            <MoreInfoReserve dataHere={dataHere}/>
+        )
+    }
+
     useEffect(()=>{
         if(activePatronEmail == '' && user != null){
             setActivePatronEmail(user.email)
@@ -36,25 +45,37 @@ function BorrowReserveFilter() {
             await getDocs(patronBorrows).then( res => {
                 
                 //Get the ISSUE docs that the active patron has borrowed
-                res.docs.map((doc)=>{
+                res.docs.map((docH)=>{
                     let tmpMap = {}
-                    let timeDue = doc.data().issue_due.toDate().toLocaleDateString('en-US') + " " + 
-                                    doc.data().issue_due.toDate().toLocaleTimeString('en-US');
-                    let fine    = doc.data().issue_fine;
+                    let timeDue = docH.data().issue_due.toDate().toLocaleDateString('en-US') + " " + 
+                                    docH.data().issue_due.toDate().toLocaleTimeString('en-US');
+                    let fine    = docH.data().issue_fine;
 
-                        tmpMap.issue_id             =   doc.id;
-                        tmpMap.issue_status         =   doc.data().issue_status;
-                        tmpMap.issue_fine           =   fine;
-                        tmpMap.issue_due            =   timeDue;
-                        tmpMap.issue_checkout_date  =   doc.data().issue_checkout_date;
-                        tmpMap.m_id                 =   doc.data().m_id;
-                        tmpMap.m_title              =   doc.data().m_title;
-                        tmpMap.patron_id            =   doc.data().patron_id;
-
-                    if(doc.data().issue_status != 'confirmed') {
-                        tmpMap.issue_due = null;
-                        tmpMap.issue_fine   = null;
-                        setReserveResult(prev => prev.concat(tmpMap))
+                    tmpMap.issue_id             =   docH.id;
+                    tmpMap.issue_status         =   docH.data().issue_status;
+                    tmpMap.issue_fine           =   fine;
+                    tmpMap.issue_due            =   timeDue;
+                    tmpMap.issue_checkout_date  =   docH.data().issue_checkout_date;
+                    tmpMap.patron_id            =   docH.data().patron_id;
+                    tmpMap.m_id                 =   docH.data().m_id;
+                    tmpMap.m_title              =   docH.data().m_title;
+                    
+                    if(docH.data().issue_status != 'confirmed') {
+                        let queryMaterial = doc(db, 'Material', docH.data().m_id)
+                        getDoc(queryMaterial).then( (qM)=>{
+                            console.log(qM.data())
+                            tmpMap.m_author     = qM.data().m_author;
+                            tmpMap.m_dept       = qM.data().m_dept, 
+                            tmpMap.m_pub_date   = qM.data().m_pub_date,
+                            tmpMap.m_copies     = qM.data().m_copies,
+                            tmpMap.m_call_num   = qM.data().m_call_num
+                            tmpMap.m_more_info  = moreInfoReserve(qM.data())
+                        }).then(()=>{
+                            tmpMap.issue_due = null;
+                            tmpMap.issue_fine   = null;
+                            setReserveResult(prev => prev.concat(tmpMap))
+                        })
+                        
                     }  else {
                         setBorrowingResult(prev => prev.concat(tmpMap))
                     }
@@ -71,7 +92,11 @@ function BorrowReserveFilter() {
     ]);
 
     const [columnsReserve] = useState([
+        {name : 'm_call_num',      title : 'CALL NUM'},
         {name : 'm_title',      title : 'TITLE'},
+        { name: 'm_author',     title: 'AUTHOR' },
+        { name: 'm_dept',       title: 'DEPARTMENT' },
+        { name: 'm_more_info',     title: ' '},
     ]);
 
     return (
