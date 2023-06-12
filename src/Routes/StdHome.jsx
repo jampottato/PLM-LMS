@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate} from "react-router-dom";
 
 import StdNav from '../Components/StdNav';
 import Footer from "../Components/Footer";
 import "../Styles/StdHome.css"
 import BookList from "../Components/BookList";
-import BorrowRecord from "../Components/BorrowRecord";
+import BorrowReserveFilter from "../Components/BorrowReserve/BorrowReserveFilter";
 
 import { addDoc, collection, query, where, getDocs, setDoc, doc } from "firebase/firestore";
 import { db, auth } from "../Database/firebase-config";
@@ -25,7 +26,7 @@ import Select from '@mui/material/Select';
 
 
 function StdHome() {
-
+	const navigate = useNavigate()
 	const [pn, setPN] = useState('');
 	const [studentInp, setStudentInp] = useState("")
 	const [college, setCollege] = useState("")
@@ -85,33 +86,36 @@ function StdHome() {
 		"Bachelor of Science In Hospitality Management - BSHM",
 		"Bachelor of Science in Tourism Management - BSTM"
 	]
-
-	var user = auth.currentUser;
-	const confirmEnteredData = query(collection(db, "UserData"), where("patron_email", "==", activePatronEmail))
-
-	auth.onAuthStateChanged(user => {
-		if(user == null) {
-			// User has logged out
-		}
-		if(user != null) {
-			setName(user.displayName)
-			setActivePatronEmail(user.email)
-		}
-	})
+	const [isInitialized, setInitialized] = useState(false)
 
 	useEffect(()=>{
-		if(user == null){
-		} else {
-			setActivePatronEmail(user.email)
-		}
-	},[user])
+		auth.onAuthStateChanged(user => {
+			if(user == null) {
+				// User has logged out
+			}
+			if(user != null) {
+				console.log('|')
+				const userEmail	= user.email;
+				const userName  	= user.displayName;
+				setActivePatronEmail(userEmail)
+				setName (userName)
+			}
+			if(isInitialized == false){
+				setInitialized(true)
+			}
+		})
+	},[isInitialized])
 
 	// Check if the user has already ENTERED DATA completely
 	// if yes : no need for modal
 	// if no : show modal
 	const snapshotQuery = async () => {
+		let confirmEnteredData =  query(collection(db, "UserData"), where("patron_email", "==", activePatronEmail))
+
+		console.log('snapshotquery')
 		//Query result from UserData
 		await getDocs(confirmEnteredData).then((v) => {
+			console.log('result of confirmEnteredData: ' , v, ' ', v.size)
 			if(activePatronEmail != null && activePatronEmail != '' ) {
 				if(v.size > 0){
 					v.forEach((doc)=>{
@@ -119,25 +123,28 @@ function StdHome() {
 							// query to set the needed PATRON details
 							setPN(doc.data().patron_id)
 							setCollege(doc.data().college)
-							
+							setActivePatronEmail(doc.data().patron_email)
+							setName(doc.data().patron_name)
 							setOpen(false);
 						} else {
-							console.log('OPENED FIRST')
 							setOpen(true)
 						} 
 					})
 				} else {
-					console.log('OPENED LAST')
 					setOpen(true)
 				}
 			}
 		})
 	}
 	snapshotQuery();
-
+	
 	const filterInpSN = (val) => {
+		console.log('filterINPSN is called')
 		setPN(val.replace(/\D/g, ''))
 	}
+	useEffect(()=>{
+		console.log('PN is called : ',pn)
+	},[pn])
 	
 	const handleClose = async (event) => {
 		if(pn.length == 9) {
@@ -154,12 +161,10 @@ function StdHome() {
 				program:program,
 				patron_id:pn,
 				is_completed:true
+			}).then(()=>{
+				setOpen(false);
 			})
-			
-			setOpen(false);
-			window.location.reload()
 		} else {
-			alert("SN LENGTH\t" + pn.length)
 			if(pn.length < 9) {
 				setStudentInp("You have missed some digits")
 			} else {
@@ -200,11 +205,23 @@ function StdHome() {
 				setPrograms(["Bachelor of Science in Nursing"])
 				break;
 		} 
-	}, [name, college, pn, studentInp]);
+	}, [college]);
 
 	const noRefresh = (event) => {
 		event.preventDefault();
 	}
+
+	const logouts = ()=>{
+        auth.signOut().then(() => {
+            // Logout successful
+            console.log('User logged out.');
+			navigate('/')
+            // You can redirect to another page or update UI as needed
+          }).catch((error) => {
+            // An error occurred
+            console.log('Logout error:', error);
+          });
+    }
 
 	return (
 	<>
@@ -280,10 +297,11 @@ function StdHome() {
 				<BookList activePID={pn} name={name} activePatronEmail={activePatronEmail} college={college}/>
 			</>
 			<>
-				<BorrowRecord/>
+				<BorrowReserveFilter/>
 			</>
 			<Footer/>
 		</div>
+		<Button onClick={()=>logouts()}>lgout</Button>
 	</>
 	) 
 }

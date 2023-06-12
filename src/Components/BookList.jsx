@@ -2,15 +2,18 @@ import {useState, useEffect} from "react";
 import {db} from "../Database/firebase-config";
 import "../Styles/BookList.css";
 
-import { Button, Grid} from '@mantine/core';
+import { Button, Grid, Modal, Group} from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { Container } from "react-bootstrap";
 
 import {doc, collection, getDoc, addDoc, updateDoc, getDocs, Timestamp} from "firebase/firestore";
 
 import BookListBorrowComp from './BooksListBorrowComp';
-
+import MoreInfo from './MoreInfo';
 
 function BookList(props) {
+    const [opened, { open, close }] = useDisclosure(false)
+
     // Get these email, name, and idNumber for us to identify who is going to reserve some books 
     let activePatronEmail   =   props.activePatronEmail;          // They are in a localStorage because we want to get the
     let activePatronName    =   props.name;                       // current LOGGED IN user (available info only are those)
@@ -81,12 +84,32 @@ function BookList(props) {
         }
     }
 
+    // Reserve BTN
     const reserveBtn = (mid, mtitle, mcopies) => {
         return (
             <Button style={{display:"inline-block",margin:0,padding:"0 30px 0 30px",maxWidth:'100%'}} onClick={() => getInfo(mid, mtitle)} disabled={disableWhenZero(mcopies)}>RESERVE</Button>
         )
     }
 
+    // More details BTN
+    const moreInfo = (title, author, dept, pubYear, copies) => {
+        return (
+            <MoreInfo title={title} author={author} department={dept} pubYear={pubYear} copies={copies}/>
+        )
+    }
+
+    const textPositioning = (content) => {
+        const noOverflow = {
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'unset',
+          }
+        return (
+            <span style={noOverflow}>{content}</span>
+        )
+    }
+
+    // Generate the Materials list
     useEffect(()=>{
         const getAllMaterials = async ()=>{
             await getDocs(colRefMaterial).then( (qSnapshot)=>{
@@ -98,7 +121,13 @@ function BookList(props) {
                         m_copies    : docMaterial.data().m_copies,
                         m_dept      : docMaterial.data().m_dept, 
                         m_pub_date  : docMaterial.data().m_pub_date,
-                        m_btn       : reserveBtn(docMaterial.id,docMaterial.data().m_title,docMaterial.data().m_copies)
+                        m_btn       : reserveBtn(docMaterial.id,docMaterial.data().m_title,docMaterial.data().m_copies),
+                        m_more_info : moreInfo( docMaterial.data().m_title, 
+                                                docMaterial.data().m_author,
+                                                docMaterial.data().m_dept,
+                                                docMaterial.data().m_pub_date,
+                                                docMaterial.data().m_copies
+                                                )
                     }))
                 setMaterialResult(materials)
             })
@@ -130,17 +159,20 @@ function BookList(props) {
     }
 
     const [columns] = useState([
-        { name: 'm_btn',        title: 'RESERVE' },
+        { name: 'm_btn',        title: ' ' },
         { name: 'm_title',      title: 'TITLE' },
         { name: 'm_author',     title: 'AUTHOR' },
-        { name: 'm_pub_date',   title: 'PUBLISHED YEAR' },
         { name: 'm_dept',       title: 'DEPARTMENT' },
         { name: 'm_copies',     title: 'COPIES'},
+        { name: 'm_more_info',     title: ' '},
     ]);
+
+    
 
     return (
         <>
         <div>
+            
             <Container fluid='true' className="head-search">
                 <Grid className="hs">
                     <Grid.Col span={5} className="welcome-msg">
