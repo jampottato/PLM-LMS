@@ -13,7 +13,7 @@ function MoreInfoReserve(props) {
     }
     const buttonPosition = {
         margin : 0,
-        padding : 10,
+        padding : '10px',
     }
 
     const styledHeader = () => {

@@ -20,7 +20,7 @@ import {
   TableColumnResizing,
 } from '@devexpress/dx-react-grid-material-ui';
 
-function AdminBorrowTable(props) {
+function AdminReserveTable(props) {
     const tableP = {
         width: '80%',
         margin: '30px auto 20px auto',
@@ -94,7 +94,7 @@ function AdminBorrowTable(props) {
         
         <IntegratedPaging />
         <SortingState
-          defaultSorting={[{ columnName: 'issue_due', direction: 'asc' }]}
+          defaultSorting={[{ columnName: 'issue_checkout_date', direction: 'asc' }]}
         />
         <IntegratedSorting/>
         <Table  cellComponent={Cell}/>
@@ -111,4 +111,4 @@ function AdminBorrowTable(props) {
     </>
   );
 }
-export default AdminBorrowTable;
+export default AdminReserveTable;

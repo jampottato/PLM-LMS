@@ -2,7 +2,7 @@ import {useState, useEffect} from "react";
 import {db} from "../Database/firebase-config";
 import {increment, setDoc, doc, query, collection, where, getDocs, onSnapshot, getDoc, QuerySnapshot, addDoc, documentId, updateDoc, deleteDoc} from "firebase/firestore";
 import { Container } from "react-bootstrap";
-import { Button, Table, Grid, Input, Center, Flex, Pagination, SimpleGrid, ActionIcon } from "@mantine/core";
+import { Button, Table, Grid, Input, Center, Flex, Pagination, SimpleGrid, ActionIcon, Stack, Notification } from "@mantine/core";
 import '../Styles/Admin.css';
 import { IconSearch } from "@tabler/icons-react";
 import StdHome from './StdHome';
@@ -10,12 +10,13 @@ import StdHome from './StdHome';
 import StdNav from "../Components/StdNav";
 import Footer from "../Components/Footer";
 import DeleteIcon from '@mui/icons-material/Delete';
-import { IconTrash } from "@tabler/icons-react";
+import { IconTrash, IconCheck } from "@tabler/icons-react";
 
 
 import AdminBorrowTable from "./AdminBorrowTable";
 import { Fragment } from "react";
 import AdminAppointmentTable from "./AdminAppointmentTable";
+import AdminReserveTable from "./AdminReserveTable";
 
 function Admin() {
     const STATUS_ARR = ['not confirmed', 'confirmed', 'returned']
@@ -28,6 +29,7 @@ function Admin() {
 
     const [issueResult, setIssueResult] = useState([])
     const [specificResult, setSpecResult] = useState([])
+    const [specificResultC, setSpecResultC] = useState([])
     const colRefIssue = collection(db, "Issue")
     
     const [searchRes, setSearchRes] = useState([])
@@ -78,7 +80,6 @@ function Admin() {
         console.log('Issue result has been filled\t:\t',issueResult)
     }, [issueResult])
     
-    
     const confirmation = (m_status, issueID, matID) => {
         setActiveMaterial(matID)
         setActiveIssue(issueID)
@@ -92,6 +93,39 @@ function Admin() {
             setStatus(STATUS_ARR[2])
         }
         
+    }
+
+    const returnMaterial = (m_status, issueID, matID) => {
+        setActiveMaterial(matID)
+        setActiveIssue(issueID)
+        if(m_status == 'confirmed'){
+            //update to not confirmed
+            setStatus(STATUS_ARR[0])
+        } else if (m_status == 'not confirmed') {
+            //update to confirmed
+            setStatus(STATUS_ARR[1])
+        } else if (m_status == 'returned') {
+            setStatus(STATUS_ARR[2])
+        }
+
+        issueResult.map(results =>{
+            if(results.issue_id == issueID){
+                console.log('returnMaterial function', )
+                addDoc(collection(db, 'ReturnReports'), results)
+                return
+            }
+        })
+        
+
+        
+    }
+
+    const cancelConfirmation = async (iid) => {
+        await updateDoc(doc(db, 'Issue', iid), {
+            issue_status: 'not confirmed'
+        }).then(()=>{
+            window.location.reload(false);
+        })
     }
 
     // If admin has changed the status --> confirmed, returned, not confirmed
@@ -112,11 +146,16 @@ function Admin() {
             } else if(status == 'returned'){
                 var answer = prompt('Are you sure to return this?')
                 if(answer == 'yes'){
+                    
                     await deleteDoc(doc(db, "Issue", activeIssue))
                     // add one to the book you have
                     await updateDoc(doc(db,'Material',activeMaterial),{
                         material_copies:increment(1)
+                    }).then(()=>{
+                        window.location.reload(false);
                     })
+
+
                 } else {
                     alert('You have cancelled to return the book')
                 }
@@ -132,21 +171,26 @@ function Admin() {
             return (
                 <td>
                     <>
-                        <Button style={{display:"inline-block"}} className="confirmed-btn" variant="light" color="green" radius="xs" size="xs"  uppercase>
-                            {val}
+                        <Button  onClick={()=>returnMaterial('returned', issueID, matID)} style={{display:"inline-block", width:'105px'}} className="return-btn" variant="light" color="red" radius="xs" size="xs"  uppercase>
+                                RETURN
                         </Button>
-                        <ActionIcon onClick={()=>confirmation('returned', issueID, matID)} style={{display:"inline-block",margin:'2px',textAlign:'center'}} variant="subtle"><IconTrash size="17" /></ActionIcon>
+                        <Button onClick={()=>cancelConfirmation(issueID)} style={{display:"inline-block"}} className="cancel-btn" variant="light" color="yellow" radius="xs" size="xs"  uppercase>
+                            <center>CANCEL <br/>CONFIRM</center>
+                        </Button>
+                        
                     </>
                 </td>
             )
         } 
         else if(val == "not confirmed") {
             return (
-                <td>
-                        <Button onClick={() => confirmation('not confirmed', issueID, matID)} className="nconfirmed-btn" variant="light" color="red" radius="xs" size="xs"  uppercase>
-                            {val}
+                <td >
+                    <Stack align='center'>
+                        <Button style={{display:"inline-block"}} className="nconfirmed-btn" onClick={() => confirmation('not confirmed', issueID, matID)} variant="light" color="green" radius="xs" size="xs"  uppercase>
+                            CONFIRM
                         </Button>
-                        <ActionIcon onClick={()=>confirmation('returned', issueID, matID)} style={{display:"inline-block",margin:'2px',textAlign:'center'}} variant="subtle"><IconTrash size="17" /></ActionIcon>
+                    </Stack>
+                    
                 </td>
             )
         }
@@ -158,6 +202,8 @@ function Admin() {
             await issueResult.map((idd)=>{
                 let res = {}
                 const specificMat = getDoc(doc(db, "Material", idd.m_id)) 
+                const dateReserved = idd.issue_checkout_date.toDate().toLocaleDateString('en-US') + " " + idd.issue_checkout_date.toDate().toLocaleTimeString('en-US')
+                res.issue_checkout_date = dateReserved
                 
                 if(idd.issue_status == 'confirmed'){
                     //check if the date in DB is confirmed by admin
@@ -218,20 +264,31 @@ function Admin() {
                 }
                 
                 res = Object.assign(res, {patron_id: idd.patron_id, patron_name: idd.patron_name})
+                
 
                 specificMat.then((doc)=>{
                     res = Object.assign(res, doc.data())   
-
+                }).then(()=>{
                     // To avoid duplicating results
                     if(!(specificResult.includes(res))){
-                        setSpecResult(prev => (prev.concat(res)))  
+                        if(idd.issue_status == 'confirmed'){
+                            setSpecResultC(prev => (prev.concat(res)))  
+                        }else {
+                            setSpecResult(prev => (prev.concat(res)))  
+                        }
                     }
                 })
             })
         }
         specResult()
-        
     }, [issueResult])
+
+    useEffect(()=>{
+        console.log('Specific result NC', specificResult)
+    },[specificResult])
+    useEffect(()=>{
+        console.log('Specific result C', specificResultC)
+    },[specificResultC])
 
     
 
@@ -257,14 +314,24 @@ function Admin() {
         setSearchRes(filterSearch)
     }
 
-    const [columns] = useState([
-        { name: 'patron_id',        title: 'ID' },
+    const [columnsReserve] = useState([
+        { name: 'patron_id',        title: 'PATRON ID' },
         { name: 'patron_name',      title: 'NAME' },
         { name: 'm_title',          title: 'TITLE' },
+        { name: 'issue_checkout_date',        title: 'RESERVED DATE' },
+        { name: 'issue_status',     title: ' ' },
+    ]);
+
+    const [columnsBorrow] = useState([
+        { name: 'patron_id',        title: 'PATRON ID' },
+        { name: 'patron_name',      title: 'NAME' },
+        { name: 'm_title',          title: 'TITLE' },
+        { name: 'issue_checkout_date',        title: 'RESERVED DATE' },
         { name: 'issue_due',        title: 'DUE' },
         { name: 'issue_fine',       title: 'PENALTY' },
-        { name: 'issue_status',     title: 'STATUS' },
+        { name: 'issue_status',     title: ' ' },
     ]);
+
 
     const apptABT = () => {
         setHiddAppt(false)
@@ -319,7 +386,8 @@ function Admin() {
             </Grid>
         </Container>
 
-        <AdminBorrowTable       hide={hiddRese} searchValue={searchRes} admin_columns={columns}/>
+        <AdminReserveTable      hide={hiddRese} searchValue={searchRes} admin_columns={columnsReserve}/>
+        <AdminBorrowTable       hide={hiddRese} searchValue={specificResultC} admin_columns={columnsBorrow}/>
         <AdminAppointmentTable  hide={hiddAppt}/>
 
     <Footer/>

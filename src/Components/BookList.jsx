@@ -6,7 +6,7 @@ import { Button, Grid, Modal, Group} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Container } from "react-bootstrap";
 
-import {doc, collection, getDoc, addDoc, updateDoc, getDocs, Timestamp} from "firebase/firestore";
+import {doc, collection, getDoc, addDoc, updateDoc, getDocs, Timestamp, onSnapshot} from "firebase/firestore";
 
 import BookListBorrowComp from './BooksListBorrowComp';
 import MoreInfo from './MoreInfo';

@@ -3,7 +3,7 @@ import {db, auth} from "../../Database/firebase-config";
 import {query, collection, where, getDocs, doc, getDoc} from "firebase/firestore";
 import { Container } from "react-bootstrap";
 import '../../Styles/BorrowRecord.css';
-import { Grid, Table } from "@mantine/core";
+import { Grid, Table, Button, Stack } from "@mantine/core";
 import BorrowComp from "./BorrowComp";
 import ReserveComp from "./ReserveComp";
 import MoreInfo from "../MoreInfo";
@@ -30,7 +30,13 @@ function BorrowReserveFilter() {
     // More details BTN
     const moreInfoReserve = (dataHere) => {
         return (
-            <MoreInfoReserve dataHere={dataHere}/>
+            <>
+            
+                <MoreInfoReserve dataHere={dataHere}/> 
+                <Stack align='center'>
+                <Button style={{margin:0,padding:'10px',width:'38%'}}>cancel</Button>
+            </Stack>
+            </>
         )
     }
 
