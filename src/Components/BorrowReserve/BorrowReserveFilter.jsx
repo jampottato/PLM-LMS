@@ -1,6 +1,6 @@
 import {useState, useEffect} from "react";
 import {db, auth} from "../../Database/firebase-config";
-import {query, collection, where, getDocs, doc, getDoc} from "firebase/firestore";
+import {query, collection, where, getDocs, doc, getDoc, updateDoc, addDoc, deleteDoc} from "firebase/firestore";
 import { Container } from "react-bootstrap";
 import '../../Styles/BorrowRecord.css';
 import { Grid, Table, Button, Stack } from "@mantine/core";
@@ -27,15 +27,30 @@ function BorrowReserveFilter() {
         }
     },[user])
 
+    const cancelReserve = async (mId, iId, mCopies, issueData) => {
+        // +1 again on the material copies identified
+        // Add the Issue record to a new collection called CancelledRecords
+        // Delete in Issue ccolelction
+        await updateDoc(doc(db, 'Material', mId), {
+            m_copies: mCopies+1
+        })
+        await addDoc(collection(db, 'CancelledRecords'), {
+            issue_id: iId,
+            ...issueData
+        })
+        await deleteDoc(doc(db, 'Issue', iId)).then(
+            window.location.reload(false)
+        )
+    }
+
     // More details BTN
-    const moreInfoReserve = (dataHere) => {
+    const moreInfoReserve = (dataHere, mId, iId, mCopies, issueData) => {
         return (
             <>
-            
                 <MoreInfoReserve dataHere={dataHere}/> 
                 <Stack align='center'>
-                <Button style={{margin:0,padding:'10px',width:'38%'}}>cancel</Button>
-            </Stack>
+                <Button onClick={()=>cancelReserve(mId, iId, mCopies, issueData)} style={{margin:0,padding:'10px',width:'38%'}}>cancel</Button>
+                </Stack>
             </>
         )
     }
@@ -75,7 +90,7 @@ function BorrowReserveFilter() {
                             tmpMap.m_pub_date   = qM.data().m_pub_date,
                             tmpMap.m_copies     = qM.data().m_copies,
                             tmpMap.m_call_num   = qM.data().m_call_num
-                            tmpMap.m_more_info  = moreInfoReserve(qM.data())
+                            tmpMap.m_more_info  = moreInfoReserve(qM.data(), docH.data().m_id, docH.id, qM.data().m_copies, docH.data())
                         }).then(()=>{
                             tmpMap.issue_due = null;
                             tmpMap.issue_fine   = null;
@@ -98,7 +113,7 @@ function BorrowReserveFilter() {
     ]);
 
     const [columnsReserve] = useState([
-        {name : 'm_call_num',      title : 'CALL NUM'},
+        {name : 'm_call_num',      title : 'CALL NUMBER'},
         {name : 'm_title',      title : 'TITLE'},
         { name: 'm_author',     title: 'AUTHOR' },
         { name: 'm_dept',       title: 'DEPARTMENT' },

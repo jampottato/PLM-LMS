@@ -37,6 +37,7 @@ function ReserveComp(props) {
 		  style={{
 			...style,
 			textAlign : 'center',
+			fontWeight : 'bold'
 		  }}
 		/>
 	  );

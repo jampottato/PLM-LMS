@@ -36,6 +36,7 @@ function AdminReserveTable(props) {
         style={{
         ...style,
         textAlign : 'center',
+        fontWeight : 'bold'
         }}
       />
       );
@@ -98,7 +99,6 @@ function AdminReserveTable(props) {
         />
         <IntegratedSorting/>
         <Table  cellComponent={Cell}/>
-        <TableColumnResizing />
         <TableHeaderRow showSortingControls cellComponent={HeadStyle}/>
         <Toolbar />
         

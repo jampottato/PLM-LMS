@@ -36,6 +36,7 @@ function BorrowComp(props) {
 		  style={{
 			...style,
 			textAlign : 'center',
+			fontWeight : 'bold'
 		  }}
 		/>
 	  );

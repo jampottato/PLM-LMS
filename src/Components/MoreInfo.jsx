@@ -26,7 +26,7 @@ function MoreInfo(props) {
 
     return (
         <div style={buttonPosition}>
-            <Button onClick={open} style={buttonPosition} color='green'>more info</Button>
+            <Button onClick={open} style={buttonPosition} color='green'>MORE INFO</Button>
             <Modal 
                 
                 opened={opened} 

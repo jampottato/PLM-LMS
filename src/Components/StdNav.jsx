@@ -5,6 +5,7 @@ import logo from '../assets/logo.png';
 import {Link} from "react-router-dom";
 
 import {BsHouseDoorFill, BsFillFileTextFill, BsBookHalf, BsFillPlayBtnFill } from "react-icons/bs";
+import Logout from './Logout';
 
 function StdNav() {
   return (
@@ -23,9 +24,9 @@ function StdNav() {
       <Nav className='FunctionNav'>
         <Link to = "/StdHome" className='home'><BsHouseDoorFill/>  Home</Link>
         <Link to = '/Appointment' className='appointment'><BsFillFileTextFill/> Appointment</Link>
-        <Link to = '/Resources' className='resources'><BsBookHalf/> Resources</Link>
-        <Link to = "/Tutorial" className=' tutorial'><BsFillPlayBtnFill/> Tutorial</Link>
+        <Logout/>
       </Nav>
+      
     </Navbar>
   )
 }

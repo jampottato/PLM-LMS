@@ -58,13 +58,10 @@ function Header() {
           <img src={fire}/>
 
           <div className='ContentText'>
-            <h2>Hero Title Sample</h2>
-            <h3>Hero Sub-title Description</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-              sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-              Duis aute irure dolor in reprehenderit in voluptate velit esse </p>
-              <Button href="" variant='dark'>Read More</Button>
+          <h2>Haribon - Library Management System</h2>
+            <h3>Haribon: Redefining Library Management System with Enchanced Online Capabilities</h3>
+            <p> An enhanced system that prioritizes a better user experience with its user-friendly interface and streamlined features, ensuring easy navigation and optimal usability.</p>
+             
           </div>
         </div>
           <div className='Contact'>

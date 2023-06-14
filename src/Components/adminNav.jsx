@@ -1,10 +1,11 @@
-import React from 'react';
-import "../Styles/StdNav.css"
+
+import "../Styles/AdminNav.css"
 import {Nav,Navbar} from 'react-bootstrap';
 import logo from '../assets/logo.png';
 import {Link} from "react-router-dom";
 
-import {BsHouseDoorFill, BsFillFileTextFill, BsBookHalf, BsFillPlayBtnFill } from "react-icons/bs";
+import {BsHouseDoorFill, BsFillFileTextFill } from "react-icons/bs";
+import Logout from "./Logout";
 
 function AdminNav() {
   return (
@@ -22,9 +23,8 @@ function AdminNav() {
     </Navbar.Brand>
       <Nav className='FunctionNav'>
         <Link to = "/StdHome" className='home'><BsHouseDoorFill/>  Home</Link>
-        <Link to = '/Appointment' className='appointment'><BsFillFileTextFill/> Appointment</Link>
-        <Link to = '/Resources' className='resources'><BsBookHalf/> Resources</Link>
-        <Link to = "/Tutorial" className=' tutorial'><BsFillPlayBtnFill/> Tutorial</Link>
+        <Link to = "/AddMaterial" className='appointment'><BsFillFileTextFill/> Add Material</Link>
+        <Logout/>
       </Nav>
     </Navbar>
   )

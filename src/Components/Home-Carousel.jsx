@@ -13,8 +13,8 @@ function HomeCarousel() {
           alt="First slide"
         />
         <Carousel.Caption>
-          <h3>First slide label</h3>
-          <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+        <h3>PLM Facade</h3>
+          <p>An inviting gateway to karunungan, kaunlaran, kadakilaan</p>
         </Carousel.Caption>
 
       </Carousel.Item >
@@ -25,8 +25,8 @@ function HomeCarousel() {
         />
 
         <Carousel.Caption>
-          <h3>Second slide label</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        <h3>Eternal Torch and the Flame of Excellence</h3>
+          <p>The Iconic Sibuyas</p>
         </Carousel.Caption>
       </Carousel.Item>
 
@@ -37,9 +37,9 @@ function HomeCarousel() {
         />
 
         <Carousel.Caption>
-          <h3>Third slide label</h3>
+        <h3>PLM Aerial View</h3>
           <p>
-            Praesent commodo cursus magna, vel scelerisque nisl consectetur.
+          Where students are encourage to explore their passions and expand their horizons
           </p>
         </Carousel.Caption>
       </Carousel.Item>

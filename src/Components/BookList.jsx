@@ -2,7 +2,8 @@ import {useState, useEffect} from "react";
 import {db} from "../Database/firebase-config";
 import "../Styles/BookList.css";
 
-import { Button, Grid, Modal, Group} from '@mantine/core';
+import { Button, Grid, Modal, Group, Flex, Input} from '@mantine/core';
+import { IconSearch } from "@tabler/icons-react";
 import { useDisclosure } from '@mantine/hooks';
 import { Container } from "react-bootstrap";
 
@@ -28,7 +29,7 @@ function BookList(props) {
     const [materialResult, setMaterialResult] = useState([])    // The result for the Materials collection
     
     //SEARCH VALUE
-    const [searchVal, setSearchVal] = useState(localStorage.getItem('college')) // The default search value is the department of the patron
+    const [searchVal, setSearchVal] = useState(props.college) // The default search value is the department of the patron
     
 
     // Disable the borrow button when the copies of book are 0 
@@ -102,7 +103,7 @@ function BookList(props) {
     useEffect(()=>{
         const getAllMaterials = async ()=>{
             await getDocs(colRefMaterial).then( (qSnapshot)=>{
-                let materials =
+                setMaterialResult(
                     qSnapshot.docs.map((docMaterial)=>({
                         m_id        : docMaterial.id,
                         m_author    : docMaterial.data().m_author,
@@ -119,7 +120,7 @@ function BookList(props) {
                                                 docMaterial.data().m_copies
                                                 )
                     }))
-                setMaterialResult(materials)
+                )
             })
         }
         getAllMaterials()
@@ -128,29 +129,30 @@ function BookList(props) {
     // It serves as the initiator for the contents of the books in the patron landing page after log in
     // It initiates the SEARCH VALUE into the department they are currently in
     useEffect(()=>{
-        searchQ(props.college)
+        const filteredSearch = materialResult.filter((item)=>{
+            let dept;
+
+            if (!(item.m_dept == undefined)){ dept = item.m_dept.toLowerCase() } else (dept = '/////')
+            return dept.includes(props.college.toLowerCase())
+        })
+        console.log(searchVal, 'SEARCH RES: ', filteredSearch)
+        setSearchRes(materialResult)
     },[materialResult])
 
     // Get the Material details in order to initiate a search
-    const searchQ = (val) => {
-        setSearchVal(val.toLowerCase())
+    // const searchQ = (val) => {
+    //     setSearchVal(val)
+    //     console.log('item ', materialResult)
+    //     const filteredSearch = materialResult.filter((item)=>{
 
-        const filteredSearch = materialResult.filter((item)=>{
-            const title = item.m_title.toLowerCase()
-            const dept = item.m_dept.toLowerCase()
-            const author = item.m_author.toLowerCase()
-            const pub_date = item.m_pub_date.toString()
-            return  title.includes(searchVal.toLowerCase()) || 
-                    dept.includes(searchVal.toLowerCase()) || 
-                    author.includes(searchVal.toLowerCase()) || 
-                    pub_date.includes(searchVal.toLowerCase())
-        })
-        setSearchRes(filteredSearch)
-    }
+    //         return  item.m_title.includes(val) || item.m_author.includes(val)
+    //     })
+    //     setSearchRes(filteredSearch)
+    // }
 
     const [columns] = useState([
         { name: 'm_btn',        title: ' ' },
-        { name: 'm_call_num',   title: 'CALL NUM' },
+        { name: 'm_call_num',   title: 'CALL NUMBER' },
         { name: 'm_title',      title: 'TITLE' },
         { name: 'm_author',     title: 'AUTHOR' },
         { name: 'm_dept',     title: 'DEPARTMENT' },
@@ -158,19 +160,39 @@ function BookList(props) {
         { name: 'm_more_info',     title: ' '},
     ]);
 
+    const noRefresh = (event) => {
+        event.preventDefault();
+    }
     
 
     return (
         <>
         <div>
-            
             <Container fluid='true' className="head-search">
+                
+            </Container>
+
+            <Container fluid='true' className="head-search">
+                
                 <Grid className="hs">
                     <Grid.Col span={5} className="welcome-msg">
-                        <h2 className="header-texts"><strong>Library Materials</strong></h2>
+                        <h2 className="header-texts"><strong>LIBRARY MATERIALS</strong></h2>
+
                     </Grid.Col>
-                    <Grid.Col span={3}></Grid.Col>
-                    <Grid.Col span={4}></Grid.Col>
+                    <Grid.Col span={7}>
+                    <Flex direction="row" gap="sm" align="center" justify="center" wrap="wrap">
+                        <form onSubmit={noRefresh} focused="true" target="_self">
+                            <Input hidden={true}
+                                style={{width:'500px'}}
+                                icon={<IconSearch hidden={true} size={25} />}
+                                placeholder="Search"
+                                radius="lg"
+                                className="input-edited"
+                                onChange={e => searchQ(e.target.value)}
+                            />
+                        </form>
+                        </Flex>
+                    </Grid.Col>
                 </Grid>
             </Container> 
             <BookListBorrowComp searchValue={searchRes} material_columns={columns}/>

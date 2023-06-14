@@ -12,6 +12,7 @@ import FTest from "./Routes/FTest";
 import AdminBorrowTable from "./Routes/AdminBorrowTable";
 import SetAllCopies from "./Routes/set_all_copies";
 import AddAllMat from "./Routes/add_all_records";
+import AddMaterial from "./Components/AddMaterial";
 
 function Main() {
   return (
@@ -26,6 +27,7 @@ function Main() {
       <Route path="/Homevs" element={<Homevs/>}/>
       <Route path="/EnterInfo" element={<EnterInfo/>}/>
       <Route path="/@!" element={<Admin/>}/>
+      <Route path="/AddMaterial" element={<AddMaterial/>}/>
       {/* <Route path="/ftest" element={<FTest/>}/>
       <Route path="/adbtest" element={<AdminBorrowTable/>}/> */}
       <Route path="/sets" element={<SetAllCopies/>}/>

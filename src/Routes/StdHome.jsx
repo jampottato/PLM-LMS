@@ -265,7 +265,7 @@ function StdHome() {
 			case "COS":
 				setPrograms(cosPrograms)
 				break;
-			case "Educ":
+			case "EDUC":
 				setPrograms(eduPrograms)
 				break;
 			case "PLMBS":
@@ -281,17 +281,6 @@ function StdHome() {
 		event.preventDefault();
 	}
 
-	const logouts = ()=>{
-        auth.signOut().then(() => {
-            // Logout successful
-            console.log('User logged out.');
-			navigate('/')
-            // You can redirect to another page or update UI as needed
-          }).catch((error) => {
-            // An error occurred
-            console.log('Logout error:', error);
-          });
-    }
 
 	return (
 	<>
@@ -371,7 +360,7 @@ function StdHome() {
 			</>
 			<Footer/>
 		</div>
-		<Button onClick={()=>logouts()}>lgout</Button>
+		
 	</>
 	) 
 }

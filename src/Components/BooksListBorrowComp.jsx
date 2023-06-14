@@ -23,7 +23,6 @@ import { Typography } from "@mui/material";
 
 function BoksListBorrowComp(props) {
 
-
     const tableP = {
         width: '80%',
         margin: '30px auto 20px auto',
@@ -44,7 +43,7 @@ function BoksListBorrowComp(props) {
 		  style={{
 			...style,
 			textAlign : 'center',
-			
+			fontWeight : 'bold'
 		  }}
 		/>
 	  );
@@ -70,8 +69,7 @@ function BoksListBorrowComp(props) {
 	  const Cell = (props) => {
 		return <HighlightedCell {...props} />;
 	  };
-
-
+	  
 	return (
 	<>
 		<Paper style={{...tableP}} elevation={5} >
@@ -80,7 +78,7 @@ function BoksListBorrowComp(props) {
 			rows={props.searchValue}
 			columns={props.material_columns}
 			>
-				<SearchState defaultValue="" />
+				<SearchState defaultValue={props.college} />
 				<IntegratedFiltering />
 				<PagingState
 					currentPage={currentPage}
@@ -91,7 +89,6 @@ function BoksListBorrowComp(props) {
 				
 				<IntegratedPaging />
 				<SortingState
-					defaultSorting={[{ columnName: 'm_title', direction: 'asc' }]}
 				/>
 				<IntegratedSorting />
 				

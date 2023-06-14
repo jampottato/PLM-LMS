@@ -7,7 +7,7 @@ import '../Styles/Admin.css';
 import { IconSearch } from "@tabler/icons-react";
 import StdHome from './StdHome';
 
-import StdNav from "../Components/StdNav";
+import AdminNav from "../Components/AdminNav";
 import Footer from "../Components/Footer";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconTrash, IconCheck } from "@tabler/icons-react";
@@ -246,7 +246,6 @@ function Admin() {
                         }
                         times = counter
                     } 
-
                     // Assign the penalty value calculated accdg. to the calculation above
                     if(idd.issue_due.toDate() < dateToday){
                         res.issue_fine = times*parseInt(50)
@@ -273,7 +272,7 @@ function Admin() {
                     if(!(specificResult.includes(res))){
                         if(idd.issue_status == 'confirmed'){
                             setSpecResultC(prev => (prev.concat(res)))  
-                        }else {
+                        } else {
                             setSpecResult(prev => (prev.concat(res)))  
                         }
                     }
@@ -289,8 +288,6 @@ function Admin() {
     useEffect(()=>{
         console.log('Specific result C', specificResultC)
     },[specificResultC])
-
-    
 
     const noRefresh = (event) => {
         event.preventDefault();
@@ -344,7 +341,7 @@ function Admin() {
 
   return (
     <>
-        <StdNav/>
+        <AdminNav/>
 
         <Container fluid='true' className="head-search">
             
