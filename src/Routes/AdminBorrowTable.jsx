@@ -47,7 +47,9 @@ function AdminBorrowTable(props) {
     const HighlightedCell = ({ value, style, ...restProps }) => {
       let val = value;
       if(value == 0){
-        val = '0';
+        val = '₱ 0';
+      } else if (typeof(value) == 'number') {
+        val = '₱ ' + value;
       }
       return (
         <Table.Cell

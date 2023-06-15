@@ -179,7 +179,10 @@ const coursesForCollege = getCoursesForCollege(college);
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Typography variant="h6">Make an appointment:</Typography>
+        <h1>BOOKING FOR AN APPOINTMENT</h1>
+        <h3>PLEASE BE INFORMED THAT ALL ONSITE LIBRARY TRANSACTIONS ARE BY APPOINTMENT ONLY.</h3><br/>
+        <Typography variant="h6"><strong>Make an Appointment:</strong></Typography>
+        
       </Grid>
       <Grid item xs={12}>
         <form onSubmit={handleSubmit}>

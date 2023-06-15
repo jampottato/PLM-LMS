@@ -218,11 +218,11 @@ function Admin() {
             return (
                 <td>
                     <>
-                        <Button  onClick={()=>returnMaterial('returned', issueID, matID, pName)} style={{display:"inline-block", width:'105px'}} className="return-btn" variant="light" color="red" radius="xs" size="xs"  uppercase>
+                        <Button  onClick={()=>returnMaterial('returned', issueID, matID, pName)} style={{display:"inline-block", width:'120px'}} className="nconfirmed-btn" variant="light" color="red" radius="xs" size="xs"  uppercase>
                                 RETURN
                         </Button>
                         <Button onClick={()=>cancelConfirmation(issueID,pName)} style={{display:"inline-block"}} className="cancel-btn" variant="light" color="yellow" radius="xs" size="xs"  uppercase>
-                            <center>CANCEL <br/>CONFIRM</center>
+                            <center>CANCEL <br/>CONFIRMATION</center>
                         </Button>
                         
                     </>

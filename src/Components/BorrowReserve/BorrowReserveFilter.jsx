@@ -16,6 +16,19 @@ function BorrowReserveFilter() {
     const [activePatronEmail, setActivePatronEmail] = useState('')
     const colRefIssue = collection(db, "Issue")
     var user = auth.currentUser;
+    const [currentDate, setCurrentDate] = useState()
+
+    // Fetch the Universal Time to det the date and time to only one source and sync 
+    useEffect(() => {
+        fetch("https://www.worldtimeapi.org/api/timezone/Asia/Manila.json").then( res => {
+            res.text().then( val => {
+                const toObj = JSON.parse(val) 
+                const newDate = new Date(toObj.datetime)
+                setCurrentDate(newDate)
+                
+            })
+        })
+    },[])
     
     //See if there is an active user 
     useEffect(()=>{
@@ -40,12 +53,15 @@ function BorrowReserveFilter() {
             await addDoc(collection(db, 'CancelledRecords'), {
                 issue_id: iId,
                 issue_cancel_reason: reason,
+                cancel_date: currentDate,
                 position: 'patron',
                 record_type: 'patron cancelled their reservation',
                 ...issueData
             })
-            await deleteDoc(doc(db, 'Issue', iId)).then(
+            await deleteDoc(doc(db, 'Issue', iId)).then(()=>{
                 window.location.reload(false)
+            }
+                
             )
         }
     }

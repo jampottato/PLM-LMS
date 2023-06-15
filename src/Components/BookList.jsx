@@ -59,7 +59,7 @@ function BookList(props) {
             dateDue.setDate(dateToday.getDate()+2) //+2 means that the borrow days should be max of 2 days only
 
             //Get current copies from Material collection 
-            // so that you will know what value to decrease
+            // so that you will know what value to decrease 
             let materialDetails;
             await getDoc(doc(db, "Material", bId)).then((doc)=> {
                 copies = doc.data().m_copies;
@@ -200,26 +200,22 @@ function BookList(props) {
             </Container>
 
             <Container fluid='true' className="head-search">
+                <Grid className="hs">
+                    <Grid.Col span={7}>
+                        <h1>Welcome {props.name}</h1> 
+                        <h3>{props.activePatronEmail}</h3>
+                        <br/><br/>
+                    </Grid.Col>
+                    
+                </Grid>
                 
                 <Grid className="hs">
+                    
                     <Grid.Col span={5} className="welcome-msg">
                         <h2 className="header-texts"><strong>LIBRARY MATERIALS</strong></h2>
 
                     </Grid.Col>
-                    <Grid.Col span={7}>
-                    <Flex direction="row" gap="sm" align="center" justify="center" wrap="wrap">
-                        <form onSubmit={noRefresh} focused="true" target="_self">
-                            <Input hidden={true}
-                                style={{width:'500px'}}
-                                icon={<IconSearch hidden={true} size={25} />}
-                                placeholder="Search"
-                                radius="lg"
-                                className="input-edited"
-                                onChange={e => searchQ(e.target.value)}
-                            />
-                        </form>
-                        </Flex>
-                    </Grid.Col>
+                    
                 </Grid>
             </Container> 
             <BookListBorrowComp searchValue={searchRes} material_columns={columns}/>
