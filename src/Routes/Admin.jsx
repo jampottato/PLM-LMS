@@ -81,87 +81,92 @@ function Admin() {
         console.log('Issue result has been filled\t:\t',issueResult)
     }, [issueResult])
     
-    const confirmation = async (m_status, issueID, matID) => {
-        let copies;
-        await getDoc(doc(db, "Material", matID)).then((doc)=> {
-            copies = doc.data().m_copies
-        })
-        await updateDoc(doc(db, "Material", matID), {
-            m_copies: (copies-1)
-        })
-        setActiveMaterial(matID)
-        setActiveIssue(issueID)
-        if(m_status == 'confirmed'){
-            //update to not confirmed
-            setStatus(STATUS_ARR[0])
-        } else if (m_status == 'not confirmed') {
-            //update to confirmed
-            setStatus(STATUS_ARR[1])
-        } else if (m_status == 'returned') {
-            setStatus(STATUS_ARR[2])
-        }
-        
-    }
-
-    const returnMaterial = (m_status, issueID, matID) => {
-        setActiveMaterial(matID)
-        setActiveIssue(issueID)
-        if(m_status == 'confirmed'){
-            //update to not confirmed
-            setStatus(STATUS_ARR[0])
-        } else if (m_status == 'not confirmed') {
-            //update to confirmed
-            setStatus(STATUS_ARR[1])
-        } else if (m_status == 'returned') {
-            setStatus(STATUS_ARR[2])
-        }
-
-        issueResult.map(results =>{
-            if(results.issue_id == issueID){
-                console.log('returnMaterial function', )
-                addDoc(collection(db, 'ReturnReports'), results)
-                return
+    const confirmation = async (m_status, issueID, matID,pName) => {
+        if(confirm('Are you sure you want to confirm this reservation from ' + pName + " ?")){
+            let copies;
+            await getDoc(doc(db, "Material", matID)).then((doc)=> {
+                copies = doc.data().m_copies
+            })
+            await updateDoc(doc(db, "Material", matID), {
+                m_copies: (copies-1)
+            })
+            setActiveMaterial(matID)
+            setActiveIssue(issueID)
+            if(m_status == 'confirmed'){
+                //update to not confirmed
+                setStatus(STATUS_ARR[0])
+            } else if (m_status == 'not confirmed') {
+                //update to confirmed
+                setStatus(STATUS_ARR[1])
+            } else if (m_status == 'returned') {
+                setStatus(STATUS_ARR[2])
             }
-        })
-        
-
+        }
         
     }
 
-    const cancelConfirmation = async (iid) => {
-        const reason = prompt('Why did you cancel the confirmation')
-        console.log('iid\t')
-        await updateDoc(doc(db, 'Issue', iid), {
-            issue_status: 'not confirmed'
-        })
-        await getDoc(doc(db, 'Issue', iid)).then((res)=>{
-            addDoc(collection(db, 'CancelledRecords'), {
-                issue_id: iid,
-                issue_cancel_reason: reason,
-                position: 'admin',
-                record_type: 'cancelled confirmation to borrow',
-                ...res.data()
+    const returnMaterial = (m_status, issueID, matID, pName) => {
+        if(confirm('Are you sure you want to return the material now?')){
+            setActiveMaterial(matID)
+            setActiveIssue(issueID)
+            if(m_status == 'confirmed'){
+                //update to not confirmed
+                setStatus(STATUS_ARR[0])
+            } else if (m_status == 'not confirmed') {
+                //update to confirmed
+                setStatus(STATUS_ARR[1])
+            } else if (m_status == 'returned') {
+                setStatus(STATUS_ARR[2])
+            }
+
+            issueResult.map(results =>{
+                if(results.issue_id == issueID){
+                    console.log('returnMaterial function', )
+                    addDoc(collection(db, 'ReturnReports'), results)
+                    return
+                }
             })
-        }).then(()=>{
-            window.location.reload(false)
-        })
+        }
     }
 
-    const cancelConfirmationReserve = async (iid) => {
-        const reason = prompt('Why did you cancel the reservation?')
-        console.log('iid\t')
-        await getDoc(doc(db, 'Issue', iid)).then((res)=>{
-            addDoc(collection(db, 'CancelledRecords'), {
-                issue_id: iid,
-                issue_cancel_reason: reason,
-                position: 'admin',
-                record_type: 'cancelled the patron reservation',
-                ...res.data()
+    const cancelConfirmation = async (iid,pName) => {
+        if(confirm('Are you sure you want to cancel the confirmation to borrow for this patron ' + pName + " ?")) {
+            const reason = prompt('Why did you cancel the confirmation to borrow?')
+            console.log('iid\t')
+            await updateDoc(doc(db, 'Issue', iid), {
+                issue_status: 'not confirmed'
             })
-        })
-        await deleteDoc(doc(db, 'Issue', iid)).then(()=>{
-            window.location.reload(false)
-        })
+            await getDoc(doc(db, 'Issue', iid)).then((res)=>{
+                addDoc(collection(db, 'CancelledRecords'), {
+                    issue_id: iid,
+                    issue_cancel_reason: reason,
+                    position: 'admin',
+                    record_type: 'cancelled confirmation to borrow',
+                    ...res.data()
+                })
+            }).then(()=>{
+                window.location.reload(false)
+            })
+        }
+    }
+
+    const cancelConfirmationReserve = async (iid,pName) => {
+        if(confirm('Are you sure you want to cancel the reservation by ' + pName + " ?")){
+            const reason = prompt('Why did you cancel the reservation?')
+            console.log('iid\t')
+            await getDoc(doc(db, 'Issue', iid)).then((res)=>{
+                addDoc(collection(db, 'CancelledRecords'), {
+                    issue_id: iid,
+                    issue_cancel_reason: reason,
+                    position: 'admin',
+                    record_type: 'cancelled the patron reservation',
+                    ...res.data()
+                })
+            })
+            await deleteDoc(doc(db, 'Issue', iid)).then(()=>{
+                window.location.reload(false)
+            })
+        }
 
     }
 
@@ -209,15 +214,15 @@ function Admin() {
         updateConfirmedMat()
     }, [status])
 
-    const ll = (val, issueID, matID) => {
+    const ll = (val, issueID, matID, pName) => {
         if(val == "confirmed") {
             return (
                 <td>
                     <>
-                        <Button  onClick={()=>returnMaterial('returned', issueID, matID)} style={{display:"inline-block", width:'105px'}} className="return-btn" variant="light" color="red" radius="xs" size="xs"  uppercase>
+                        <Button  onClick={()=>returnMaterial('returned', issueID, matID, pName)} style={{display:"inline-block", width:'105px'}} className="return-btn" variant="light" color="red" radius="xs" size="xs"  uppercase>
                                 RETURN
                         </Button>
-                        <Button onClick={()=>cancelConfirmation(issueID)} style={{display:"inline-block"}} className="cancel-btn" variant="light" color="yellow" radius="xs" size="xs"  uppercase>
+                        <Button onClick={()=>cancelConfirmation(issueID,pName)} style={{display:"inline-block"}} className="cancel-btn" variant="light" color="yellow" radius="xs" size="xs"  uppercase>
                             <center>CANCEL <br/>CONFIRM</center>
                         </Button>
                         
@@ -229,10 +234,10 @@ function Admin() {
             return (
                 <td >
                     <Stack align='center'>
-                        <Button style={{display:"inline-block"}} className="nconfirmed-btn" onClick={() => confirmation('not confirmed', issueID, matID)} variant="light" color="green" radius="xs" size="xs"  uppercase>
+                        <Button style={{display:"inline-block"}} className="nconfirmed-btn" onClick={() => confirmation('not confirmed', issueID, matID,pName)} variant="light" color="green" radius="xs" size="xs"  uppercase>
                             CONFIRM
                         </Button>
-                        <Button onClick={()=>cancelConfirmationReserve(issueID)} style={{display:"inline-block"}} className="nconfirmed-btn" variant="light" color="yellow" radius="xs" size="xs"  uppercase>
+                        <Button onClick={()=>cancelConfirmationReserve(issueID,pName)} style={{display:"inline-block"}} className="nconfirmed-btn" variant="light" color="yellow" radius="xs" size="xs"  uppercase>
                             <center>CANCEL <br/>RESERVATION</center>
                         </Button>
                     </Stack>
@@ -256,7 +261,7 @@ function Admin() {
                 
                 if(idd.issue_status == 'confirmed'){
                     //check if the date in DB is confirmed by admin
-                    res.issue_status = ll("confirmed", idd.issue_id, idd.m_id)
+                    res.issue_status = ll("confirmed", idd.issue_id, idd.m_id, idd.patron_name)
 
                     let dateToday = currentDate
 
@@ -308,7 +313,7 @@ function Admin() {
 
                 } 
                 else {
-                    res.issue_status = ll("not confirmed", idd.issue_id, idd.m_id)
+                    res.issue_status = ll("not confirmed", idd.issue_id, idd.m_id, idd.patron_name)
                 }
                 
                 res = Object.assign(res, {patron_id: idd.patron_id, patron_name: idd.patron_name})

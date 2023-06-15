@@ -44,20 +44,26 @@ function BorrowComp(props) {
 		return <HeaderCell {...props}/>
 	}
 
-	const HighlightedCell = ({ value, style, ...restProps }) => (
-		<Table.Cell
-		  {...restProps}
-		  style={{
-			...style,
-			whiteSpace: 'normal',  
-    		wordWrap: 'break-word',
-			border: '1px solid rgba(0,0,0,0.1)',
-			textAlign : 'center'
-		  }}
-		>
-			{value}
-		</Table.Cell>
-	);
+	const HighlightedCell = ({ value, style, ...restProps }) =>  {
+		let val = value;
+		if(value == 0){
+			val = '0';
+		}
+		return (
+			<Table.Cell
+			{...restProps}
+			style={{
+				...style,
+				whiteSpace: 'normal',  
+				wordWrap: 'break-word',
+				border: '1px solid rgba(0,0,0,0.1)',
+				textAlign : 'center'
+			}}
+			>
+				{val}
+			</Table.Cell>
+		)
+	};
 	
 	const Cell = (props) => {
 	return <HighlightedCell {...props} />;
@@ -91,7 +97,6 @@ function BorrowComp(props) {
 			/>
 			<IntegratedSorting />
 			<Table cellComponent={Cell}/>
-			<TableColumnResizing  />
 			<TableHeaderRow showSortingControls cellComponent={HeadStyle}/>
 			<Toolbar />
 			<SearchPanel />

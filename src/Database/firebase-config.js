@@ -8,17 +8,31 @@ import {
 } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAZgU0sOBHjzwsfeDR_lfRmigy9Jtw-ADY",
+  apiKey: "AIzaSyAJCPQ5tIkQXnxlXlDiKBaMFanmnhMzmTU",
 
-  authDomain: "librarymanage2.firebaseapp.com",
+  authDomain: "se-lms-tk.firebaseapp.com",
 
-  projectId: "librarymanage2",
+  projectId: "se-lms-tk",
 
-  storageBucket: "librarymanage2.appspot.com",
+  storageBucket: "se-lms-tk.appspot.com",
 
-  messagingSenderId: "931290747203",
+  messagingSenderId: "756504720193",
 
-  appId: "1:931290747203:web:5971836c5f90dc57d6dff6"
+  appId: "1:756504720193:web:4dea4935e9b1aa09f367c0",
+
+  measurementId: "G-W85R65CL61"
+
+  // apiKey: "AIzaSyAZgU0sOBHjzwsfeDR_lfRmigy9Jtw-ADY",
+
+  // authDomain: "librarymanage2.firebaseapp.com",
+
+  // projectId: "librarymanage2",
+
+  // storageBucket: "librarymanage2.appspot.com",
+
+  // messagingSenderId: "931290747203",
+
+  // appId: "1:931290747203:web:5971836c5f90dc57d6dff6"
 };
 
 const app = initializeApp(firebaseConfig);

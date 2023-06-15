@@ -66,15 +66,6 @@ function AdminReserveTable(props) {
       const [currentPage, setCurrentPage] = useState(0);
       const [pSize, setPSize] = useState(5);
       const [pSizes] = useState([5, 10, 15]);
-      const [defaultColumnWidths] = useState([
-        { columnName: 'patron_id', width: 103 },
-        { columnName: 'patron_name', width: 250 },
-        { columnName: 'm_title', width: 200 },
-        { columnName: 'issue_checkout_date', width: 200 },
-        { columnName: 'issue_due', width: 180 },
-        { columnName: 'issue_fine', width: 120 },
-        { columnName: 'issue_status', width: 200 },
-      ]);
 
   return (
     <>

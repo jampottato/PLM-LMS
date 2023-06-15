@@ -230,7 +230,8 @@ function StdHome() {
 				patron_name:name,
 				program:program,
 				patron_id:pn,
-				is_completed:true
+				is_completed:true,
+				patron_maxB : 3
 			}).then(()=>{
 				setOpen(false);
 			})

@@ -28,23 +28,25 @@ function BorrowReserveFilter() {
     },[user])
 
     const cancelReserve = async (mId, iId, mCopies, issueData) => {
-        // +1 again on the material copies identified
-        // Add the Issue record to a new collection called CancelledRecords
-        // Delete in Issue ccolelction
-        const reason = prompt('Why would you like to cancel the reservation?')
+        if(confirm('Are you sure you want to cancel reservation for ' + issueData.m_title + ' ?')){
+            // +1 again on the material copies identified
+            // Add the Issue record to a new collection called CancelledRecords
+            // Delete in Issue ccolelction
+            const reason = prompt('Why would you like to cancel the reservation?')
 
-        await updateDoc(doc(db, 'Material', mId), {
-            m_copies: mCopies+1
-        })
-        await addDoc(collection(db, 'CancelledRecords'), {
-            issue_id: iId,
-            issue_cancel_reason: reason,
-            position: 'patron',
-            ...issueData
-        })
-        await deleteDoc(doc(db, 'Issue', iId)).then(
-            window.location.reload(false)
-        )
+            await updateDoc(doc(db, 'Material', mId), {
+                m_copies: mCopies+1
+            })
+            await addDoc(collection(db, 'CancelledRecords'), {
+                issue_id: iId,
+                issue_cancel_reason: reason,
+                position: 'patron',
+                ...issueData
+            })
+            await deleteDoc(doc(db, 'Issue', iId)).then(
+                window.location.reload(false)
+            )
+        }
     }
 
     // More details BTN
@@ -105,6 +107,7 @@ function BorrowReserveFilter() {
                         })
                         
                     }  else {
+                        console.log('TMP MAP - ',tmpMap)
                         setBorrowingResult(prev => prev.concat(tmpMap))
                     }
                 })
@@ -149,7 +152,7 @@ function BorrowReserveFilter() {
             <Container fluid='true' className="head-search">
                 <Grid className="hs">
                     <Grid.Col span={5} className="welcome-msg">
-                        <h2 className="header-texts"><strong>BORROWING</strong></h2>
+                        <h2 className="header-texts"><strong>BORROWED</strong></h2>
                     </Grid.Col>
 
                     <Grid.Col span={3}></Grid.Col>

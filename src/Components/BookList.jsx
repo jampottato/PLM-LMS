@@ -7,7 +7,7 @@ import { IconSearch } from "@tabler/icons-react";
 import { useDisclosure } from '@mantine/hooks';
 import { Container } from "react-bootstrap";
 
-import {doc, collection, getDoc, addDoc, updateDoc, getDocs, Timestamp, onSnapshot} from "firebase/firestore";
+import {doc, collection, getDoc, addDoc, updateDoc, getDocs, Timestamp, onSnapshot, where, query} from "firebase/firestore";
 
 import BookListBorrowComp from './BooksListBorrowComp';
 import MoreInfo from './MoreInfo';
@@ -34,58 +34,75 @@ function BookList(props) {
 
     // Disable the borrow button when the copies of book are 0 
     const disableWhenZero = (val) => {
-        return parseInt(val) > 0 ? false : true
+        return val > 0 ? false : true
     }
 
     //PATRONS' Reserve Function (reserve button)
     const getInfo = async (bId, title) => { // bId = Material ID that the patron borrowed
-        let copies = 0
-        let dateToday = new Date()
-        let dateDue = new Date()
-        dateDue.setDate(dateToday.getDate()+2) //+2 means that the borrow days should be max of 2 days only
-
-        //Get current copies from Material collection 
-        // so that you will know what value to decrease
-        await getDoc(doc(db, "Material", bId)).then((doc)=> {
-            copies = doc.data().m_copies
-        })
-
-        //Adding of items in ISSUE entity when the patron wants to reserve a book
-        if(copies > 0){
-            //Check if there is a patron ID
-            if(!(activeIDN == null || activeIDN == '')){
-                //When the patron has confirmed, specified material data must decrease to 1
-                // await updateDoc(doc(db, "Material", bId), {
-                //     m_copies: (copies-1)
-                // })
-
-                // Add the necessary fields to Issue entity when patron confirmed to borrow a book
-                await addDoc(collection(db, "Issue"), {
-                    patron_id : activeIDN,
-                    m_id : bId,
-                    m_title: title,
-                    patron_name : activePatronName,
-                    patron_email : activePatronEmail,
-                    issue_borrowed : dateToday,
-                    issue_status : 'not confirmed',
-                    issue_checkout_date : dateToday, //today
-                    issue_due : dateDue, // 2days after
-                    issue_fine : 0 // 0
-                }).then(
-                    ()=>{
-                        alert('You have reserved a book. Come to the library to borrow the material.', activeIDN)
-                        console.log('You have reserved a book. Come to the library to borrow the material.', activeIDN)
-                    }
-                ).then(
-                    window.location.reload(false)
-                )
-            } else {
-                console.log('There is no patron ID: ', activeIDN, props.activePID)
+        if(confirm("Are you sure you want to reserve '" + title + "'?")){
+            const borrowedMaterials = query(collection(db, 'Issue'), where('patron_email', '==', activePatronEmail))
+            let count = 0;
+            await getDocs((borrowedMaterials)).then((docsHere)=>{
+                docsHere.docs.map((doc)=>{
+                    count = count + 1;
+                })
+            })
+            if(count >= 3){
+                alert('You have reached the maximum number of transactions')
+                return
             }
-        } 
-        else {
-            // TODO: Change this with a modal
-            alert("There are 0 copies, you could not borrow this")
+
+            let copies = 0
+            let dateToday = new Date()
+            let dateDue = new Date()
+            dateDue.setDate(dateToday.getDate()+2) //+2 means that the borrow days should be max of 2 days only
+
+            //Get current copies from Material collection 
+            // so that you will know what value to decrease
+            let materialDetails;
+            await getDoc(doc(db, "Material", bId)).then((doc)=> {
+                copies = doc.data().m_copies;
+                materialDetails = doc.data()
+            })
+
+            //Adding of items in ISSUE entity when the patron wants to reserve a book
+            if(copies > 0){
+                
+                //Check if there is a patron ID
+                console.log('You have reserved a book. Come to the library to borrow the material.', activeIDN)
+                if(!(activeIDN == null || activeIDN == '')){
+                    //When the patron has confirmed, specified material data must decrease to 1
+                    // await updateDoc(doc(db, "Material", bId), {
+                    //     m_copies: (copies-1)
+                    // })
+
+                    // Add the necessary fields to Issue entity when patron confirmed to borrow a book
+                    await addDoc(collection(db, "Issue"), {
+                        patron_id : activeIDN,
+                        m_id : bId,
+                        patron_name : activePatronName,
+                        patron_email : activePatronEmail,
+                        issue_borrowed : dateToday,
+                        issue_status : 'not confirmed',
+                        issue_checkout_date : dateToday, //today
+                        issue_due : dateDue, // 2days after
+                        issue_fine : 0, // 0,
+                        ...materialDetails
+                    }).then(
+                        ()=>{
+                            alert('You have reserved a book. Come to the library to borrow the material.')
+                            window.location.reload(false)
+                        }
+                    )
+                } else {
+                    alert('The user has to log in first!')
+                    console.log('There is no patron ID: ', activeIDN, props.activePID)
+                }
+            } 
+            else {
+                // TODO: Change this with a modal
+                alert("There are 0 copies, you could not borrow this")
+            }
         }
     }
 
@@ -107,6 +124,7 @@ function BookList(props) {
     useEffect(()=>{
         const getAllMaterials = async ()=>{
             await getDocs(colRefMaterial).then( (qSnapshot)=>{
+               
                 setMaterialResult(
                     qSnapshot.docs.map((docMaterial)=>({
                         m_id        : docMaterial.id,
@@ -142,6 +160,10 @@ function BookList(props) {
         console.log(searchVal, 'SEARCH RES: ', filteredSearch)
         setSearchRes(materialResult)
     },[materialResult])
+
+    useEffect(()=>{
+        console.log('SEARCHRES\t', searchRes)
+    },[searchRes])
 
     // Get the Material details in order to initiate a search
     // const searchQ = (val) => {
