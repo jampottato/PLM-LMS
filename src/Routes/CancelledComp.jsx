@@ -60,6 +60,18 @@ function CancelledComp(props) {
     const HeadStyle = (props)=>{
       return <HeaderCell {...props}/>
     }
+
+    const [defCol] = useState([
+        { columnName: 'cancel_date',          width: 250 },
+        { columnName: 'record_type',          width: 250 },
+        { columnName: 'issue_cancel_reason',  width: 250 },
+        { columnName: 'patron_id',            width: 250 },
+        { columnName: 'patron_name',          width: 250 },
+        { columnName: 'm_title',              width: 250 },
+        { columnName: 'issue_borrowed',       width: 250 },
+        { columnName: 'issue_due',            width: 250 },
+        { columnName: 'issue_fine',           width: 250 },
+    ]) 
   
     const HighlightedCell = ({ value, style, ...restProps }) => {
       let val = value;
@@ -114,6 +126,7 @@ function CancelledComp(props) {
         />
         <IntegratedSorting/>
         <Table  cellComponent={Cell}/>
+        <TableColumnResizing defaultColumnWidths={defCol}/>
         <TableHeaderRow showSortingControls cellComponent={HeadStyle}/>
         <Toolbar />
         <ExportPanel startExport={startExport} />

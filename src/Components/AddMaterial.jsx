@@ -85,7 +85,7 @@ function AddMaterial() {
 
                     <TextField
                         id="outlined-number"
-                        label="Number of Coppies"
+                        label="Number of Copies"
                         type="number"
                         InputLabelProps={{
                             shrink: true,}}

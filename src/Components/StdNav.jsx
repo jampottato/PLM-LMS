@@ -4,7 +4,7 @@ import {Nav,Navbar} from 'react-bootstrap';
 import logo from '../assets/logo.png';
 import {Link} from "react-router-dom";
 
-import {BsHouseDoorFill, BsFillFileTextFill, BsBookHalf, BsFillPlayBtnFill } from "react-icons/bs";
+import {BsHouseDoorFill, BsFillFileTextFill, BsBookHalf, BsFillPlayBtnFill} from "react-icons/bs";
 import Logout from './Logout';
 import Patron from './Patron';
 
@@ -25,7 +25,7 @@ function StdNav() {
       <Nav className='FunctionNav'>
         <Link to = "/StdHome" className='home'><BsHouseDoorFill/>  Home</Link>
         <Link to = '/Patron' className='appointment'><BsFillFileTextFill/> Appointment</Link>
-        <Logout/>
+       <Logout/>
       </Nav>
       
     </Navbar>

@@ -3,7 +3,6 @@ import { getAuth, signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { IconLogout2 } from '@tabler/icons-react';
 
-
 function Logout() {
 
     const navigate = useNavigate();

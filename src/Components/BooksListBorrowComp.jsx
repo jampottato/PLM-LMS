@@ -43,7 +43,9 @@ function BoksListBorrowComp(props) {
 		  style={{
 			...style,
 			textAlign : 'center',
-			fontWeight : 'bold'
+			fontWeight : 'bold',
+			whiteSpace: 'normal',  
+			wordWrap: 'break-word',
 		  }}
 		/>
 	  );

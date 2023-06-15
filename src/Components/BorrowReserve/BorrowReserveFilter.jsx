@@ -41,6 +41,7 @@ function BorrowReserveFilter() {
                 issue_id: iId,
                 issue_cancel_reason: reason,
                 position: 'patron',
+                record_type: 'patron cancelled their reservation',
                 ...issueData
             })
             await deleteDoc(doc(db, 'Issue', iId)).then(

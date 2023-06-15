@@ -97,6 +97,7 @@ function AdminBorrowTable(props) {
         />
         <IntegratedSorting/>
         <Table  cellComponent={Cell}/>
+        <TableColumnResizing/>
         <TableHeaderRow showSortingControls cellComponent={HeadStyle}/>
         <Toolbar />
         
