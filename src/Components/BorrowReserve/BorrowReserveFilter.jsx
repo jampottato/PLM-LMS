@@ -31,11 +31,15 @@ function BorrowReserveFilter() {
         // +1 again on the material copies identified
         // Add the Issue record to a new collection called CancelledRecords
         // Delete in Issue ccolelction
+        const reason = prompt('Why would you like to cancel the reservation?')
+
         await updateDoc(doc(db, 'Material', mId), {
             m_copies: mCopies+1
         })
         await addDoc(collection(db, 'CancelledRecords'), {
             issue_id: iId,
+            issue_cancel_reason: reason,
+            position: 'patron',
             ...issueData
         })
         await deleteDoc(doc(db, 'Issue', iId)).then(
@@ -70,12 +74,15 @@ function BorrowReserveFilter() {
                     let tmpMap = {}
                     let timeDue = docH.data().issue_due.toDate().toLocaleDateString('en-US') + " " + 
                                     docH.data().issue_due.toDate().toLocaleTimeString('en-US');
+                    let timeBorrowed = docH.data().issue_borrowed.toDate().toLocaleDateString('en-US') + " " + 
+                                docH.data().issue_borrowed.toDate().toLocaleTimeString('en-US');
                     let fine    = docH.data().issue_fine;
 
                     tmpMap.issue_id             =   docH.id;
                     tmpMap.issue_status         =   docH.data().issue_status;
                     tmpMap.issue_fine           =   fine;
                     tmpMap.issue_due            =   timeDue;
+                    tmpMap.issue_borrowed       =   timeBorrowed;
                     tmpMap.issue_checkout_date  =   docH.data().issue_checkout_date;
                     tmpMap.patron_id            =   docH.data().patron_id;
                     tmpMap.m_id                 =   docH.data().m_id;

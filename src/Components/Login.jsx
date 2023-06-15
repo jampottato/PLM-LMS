@@ -12,7 +12,7 @@ function Login() {
 
     // Fetch the Universal Time to det the date and time to only one source and sync 
     useEffect(() => {
-        fetch("http://worldtimeapi.org/api/timezone/Asia/Manila").then( res => {
+        fetch("https://www.worldtimeapi.org/api/timezone/Asia/Manila.json").then( res => {
             res.text().then( val => {
                 const toObj = JSON.parse(val) 
                 const newDate = new Date(toObj.datetime)
@@ -21,6 +21,10 @@ function Login() {
             })
         })
     },[])
+
+	useEffect(()=>{
+		console.log('currentDate - - ',currentDate)
+	},[currentDate])
 
 	function containsNumbers(str) {
 		return /[0-9]/.test(str);

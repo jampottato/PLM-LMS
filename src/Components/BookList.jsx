@@ -55,9 +55,9 @@ function BookList(props) {
             //Check if there is a patron ID
             if(!(activeIDN == null || activeIDN == '')){
                 //When the patron has confirmed, specified material data must decrease to 1
-                await updateDoc(doc(db, "Material", bId), {
-                    m_copies: (copies-1)
-                })
+                // await updateDoc(doc(db, "Material", bId), {
+                //     m_copies: (copies-1)
+                // })
 
                 // Add the necessary fields to Issue entity when patron confirmed to borrow a book
                 await addDoc(collection(db, "Issue"), {
@@ -66,12 +66,16 @@ function BookList(props) {
                     m_title: title,
                     patron_name : activePatronName,
                     patron_email : activePatronEmail,
+                    issue_borrowed : dateToday,
                     issue_status : 'not confirmed',
                     issue_checkout_date : dateToday, //today
                     issue_due : dateDue, // 2days after
                     issue_fine : 0 // 0
                 }).then(
-                    alert('You have reserved a book. Come to the library to borrow the material.')
+                    ()=>{
+                        alert('You have reserved a book. Come to the library to borrow the material.', activeIDN)
+                        console.log('You have reserved a book. Come to the library to borrow the material.', activeIDN)
+                    }
                 ).then(
                     window.location.reload(false)
                 )

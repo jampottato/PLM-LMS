@@ -67,19 +67,12 @@ function AdminBorrowTable(props) {
       const [currentPage, setCurrentPage] = useState(0);
       const [pSize, setPSize] = useState(5);
       const [pSizes] = useState([5, 10, 15]);
-      const [defaultColumnWidths] = useState([
-        { columnName: 'patron_id', width: 103 },
-        { columnName: 'patron_name', width: 250 },
-        { columnName: 'm_title', width: 200 },
-        { columnName: 'issue_checkout_date', width: 200 },
-        { columnName: 'issue_due', width: 180 },
-        { columnName: 'issue_fine', width: 120 },
-        { columnName: 'issue_status', width: 200 },
-      ]);
 
   return (
     <>
         <Paper style={tableP} elevation={5} hidden={props.hide}>
+        <h1  style={{fontSize:'2rem'}} className="header-texts"><strong>BORROWED</strong></h1>
+
         <Grid
         rows={props.searchValue}
         columns={props.admin_columns}

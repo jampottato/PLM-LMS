@@ -39,7 +39,7 @@ function Admin() {
 
     // Fetch the Universal Time to det the date and time to only one source and sync 
     useEffect(() => {
-        fetch("http://worldtimeapi.org/api/timezone/Asia/Manila").then( res => {
+        fetch("https://www.worldtimeapi.org/api/timezone/Asia/Manila.json").then( res => {
             res.text().then( val => {
                 const toObj = JSON.parse(val) 
                 const newDate = new Date(toObj.datetime)
@@ -62,6 +62,7 @@ function Admin() {
                         issue_id:           doc.id,
                         issue_checkout_date:doc.data().issue_checkout_date,
                         issue_due:          doc.data().issue_due,
+                        issue_borrowed:          doc.data().issue_borrowed,
                         issue_fine:         doc.data().issue_fine,
                         issue_status:       doc.data().issue_status,
                         m_id:               doc.data().m_id,
@@ -80,7 +81,14 @@ function Admin() {
         console.log('Issue result has been filled\t:\t',issueResult)
     }, [issueResult])
     
-    const confirmation = (m_status, issueID, matID) => {
+    const confirmation = async (m_status, issueID, matID) => {
+        let copies;
+        await getDoc(doc(db, "Material", matID)).then((doc)=> {
+            copies = doc.data().m_copies
+        })
+        await updateDoc(doc(db, "Material", matID), {
+            m_copies: (copies-1)
+        })
         setActiveMaterial(matID)
         setActiveIssue(issueID)
         if(m_status == 'confirmed'){
@@ -121,11 +129,40 @@ function Admin() {
     }
 
     const cancelConfirmation = async (iid) => {
+        const reason = prompt('Why did you cancel the confirmation')
+        console.log('iid\t')
         await updateDoc(doc(db, 'Issue', iid), {
             issue_status: 'not confirmed'
-        }).then(()=>{
-            window.location.reload(false);
         })
+        await getDoc(doc(db, 'Issue', iid)).then((res)=>{
+            addDoc(collection(db, 'CancelledRecords'), {
+                issue_id: iid,
+                issue_cancel_reason: reason,
+                position: 'admin',
+                record_type: 'cancelled confirmation to borrow',
+                ...res.data()
+            })
+        }).then(()=>{
+            window.location.reload(false)
+        })
+    }
+
+    const cancelConfirmationReserve = async (iid) => {
+        const reason = prompt('Why did you cancel the reservation?')
+        console.log('iid\t')
+        await getDoc(doc(db, 'Issue', iid)).then((res)=>{
+            addDoc(collection(db, 'CancelledRecords'), {
+                issue_id: iid,
+                issue_cancel_reason: reason,
+                position: 'admin',
+                record_type: 'cancelled the patron reservation',
+                ...res.data()
+            })
+        })
+        await deleteDoc(doc(db, 'Issue', iid)).then(()=>{
+            window.location.reload(false)
+        })
+
     }
 
     // If admin has changed the status --> confirmed, returned, not confirmed
@@ -133,10 +170,16 @@ function Admin() {
         const updateConfirmedMat = async ()=>{
             if(status == 'confirmed'){
                 // the due date must be 2 days after the confirmation
-                let dateToday = new Date()
-                let dateDue = dateToday //Date accepted by DB
-                dateDue.setDate(dateDue.getDate()+2) 
-
+                let dateToday = currentDate
+                let dateDue = dateToday; //Date accepted by DB
+                
+                
+                await updateDoc(doc(db, "Issue", activeIssue),{
+                    issue_borrowed: currentDate,
+                }).then(
+                    dateDue.setDate(dateDue.getDate()+2) 
+                )
+                
                 await updateDoc(doc(db, "Issue", activeIssue),{
                     issue_status: status,
                     issue_due: dateDue
@@ -189,6 +232,9 @@ function Admin() {
                         <Button style={{display:"inline-block"}} className="nconfirmed-btn" onClick={() => confirmation('not confirmed', issueID, matID)} variant="light" color="green" radius="xs" size="xs"  uppercase>
                             CONFIRM
                         </Button>
+                        <Button onClick={()=>cancelConfirmationReserve(issueID)} style={{display:"inline-block"}} className="nconfirmed-btn" variant="light" color="yellow" radius="xs" size="xs"  uppercase>
+                            <center>CANCEL <br/>RESERVATION</center>
+                        </Button>
                     </Stack>
                     
                 </td>
@@ -203,7 +249,10 @@ function Admin() {
                 let res = {}
                 const specificMat = getDoc(doc(db, "Material", idd.m_id)) 
                 const dateReserved = idd.issue_checkout_date.toDate().toLocaleDateString('en-US') + " " + idd.issue_checkout_date.toDate().toLocaleTimeString('en-US')
+                let dateBorrowed;
                 res.issue_checkout_date = dateReserved
+                dateBorrowed = idd.issue_borrowed.toDate().toLocaleDateString('en-US') + " " + idd.issue_borrowed.toDate().toLocaleTimeString('en-US')
+                res.issue_borrowed = dateBorrowed
                 
                 if(idd.issue_status == 'confirmed'){
                     //check if the date in DB is confirmed by admin
@@ -307,7 +356,7 @@ function Admin() {
                     name.includes(searchVal.toLowerCase()) ||
                     id.includes(searchVal.toLowerCase()) 
         })
-        
+        console.log('filtersearch\t',filterSearch)
         setSearchRes(filterSearch)
     }
 
@@ -323,7 +372,7 @@ function Admin() {
         { name: 'patron_id',        title: 'PATRON ID' },
         { name: 'patron_name',      title: 'NAME' },
         { name: 'm_title',          title: 'TITLE' },
-        { name: 'issue_checkout_date',        title: 'RESERVED DATE' },
+        { name: 'issue_borrowed',        title: 'BORROWED DATE' },
         { name: 'issue_due',        title: 'DUE' },
         { name: 'issue_fine',       title: 'PENALTY' },
         { name: 'issue_status',     title: ' ' },

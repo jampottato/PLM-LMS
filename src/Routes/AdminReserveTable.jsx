@@ -19,6 +19,7 @@ import {
   SearchPanel,
   TableColumnResizing,
 } from '@devexpress/dx-react-grid-material-ui';
+import { Container } from "react-bootstrap";
 
 function AdminReserveTable(props) {
     const tableP = {
@@ -62,8 +63,6 @@ function AdminReserveTable(props) {
     const Cell = (props) => {
     return <HighlightedCell {...props} />;
     };
-
-
       const [currentPage, setCurrentPage] = useState(0);
       const [pSize, setPSize] = useState(5);
       const [pSizes] = useState([5, 10, 15]);
@@ -79,35 +78,35 @@ function AdminReserveTable(props) {
 
   return (
     <>
-        <Paper style={tableP} elevation={5} hidden={props.hide}>
+      <Paper style={tableP} elevation={5} hidden={props.hide}>
+        <h1 style={{fontSize:'2rem'}} className="header-texts"><strong>RESERVED</strong></h1>
+
         <Grid
         rows={props.searchValue}
         columns={props.admin_columns}
         >
-        <SearchState defaultValue="" />
-        <IntegratedFiltering />
-        <PagingState
-            currentPage={currentPage}
-            onCurrentPageChange={setCurrentPage}
-            pageSize={pSize}
-            onPageSizeChange={setPSize}
-        />
-        
-        <IntegratedPaging />
-        <SortingState
-          defaultSorting={[{ columnName: 'issue_checkout_date', direction: 'asc' }]}
-        />
-        <IntegratedSorting/>
-        <Table  cellComponent={Cell}/>
-        <TableHeaderRow showSortingControls cellComponent={HeadStyle}/>
-        <Toolbar />
-        
-        <SearchPanel />
-        <PagingPanel
-            pageSizes={pSizes}
-        />
+          <SearchState defaultValue="" />
+          <IntegratedFiltering />
+          <PagingState
+              currentPage={currentPage}
+              onCurrentPageChange={setCurrentPage}
+              pageSize={pSize}
+              onPageSizeChange={setPSize}
+          />
+          <IntegratedPaging />
+          <SortingState
+            defaultSorting={[{ columnName: 'issue_checkout_date', direction: 'asc' }]}
+          />
+          <IntegratedSorting/>
+          <Table  cellComponent={Cell}/>
+          <TableHeaderRow showSortingControls cellComponent={HeadStyle}/>
+          <Toolbar />
+          <SearchPanel />
+          <PagingPanel
+              pageSizes={pSizes}
+          />
         </Grid>
-    </Paper>
+      </Paper>
     </>
   );
 }

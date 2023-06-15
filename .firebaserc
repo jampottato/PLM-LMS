@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "se-lms-tk"
-  }
+    "default": "librarymanage2",
+    "plmlms": "librarymanage2"
+  },
+  "targets": {},
+  "etags": {}
 }
