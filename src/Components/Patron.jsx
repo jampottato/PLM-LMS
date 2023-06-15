@@ -1,22 +1,25 @@
 import PatronForm from "./PatronForm"
-import Paper from '@mui/material/Paper';
-// import {makeStyles} from '@material-ui/core/styles'
+import {Paper, makeStyles} from '@material-ui/core'
+import StdNav from "./StdNav";
+import Footer from "./Footer";
 
 function Patron() {
-    // const useStyles= makeStyles(theme => ({
-    //     pageContent: {
-    //         margin: theme.spacing(5),
-    //         padding: theme.spacing(3),
+    const useStyles= makeStyles(theme => ({
+        pageContent: {
+            margin: theme.spacing(5),
+            padding: theme.spacing(3),
             
-    //     }
-    // }))
+        }
+    }))
 
-    // const classes = useStyles();
+    const classes = useStyles();
   return (
         <>
-        <Paper >
+        <StdNav/>
+        <Paper className={classes.pageContent}>
             <PatronForm/>
         </Paper>
+        <Footer/>
         </>
   
   )
