@@ -11,6 +11,7 @@ import {doc, collection, getDoc, addDoc, updateDoc, getDocs, Timestamp, onSnapsh
 
 import BookListBorrowComp from './BooksListBorrowComp';
 import MoreInfo from './MoreInfo';
+import TransactionsPatron from "./TransactionsPatron";
 
 function BookList(props) {
     const [opened, { open, close }] = useDisclosure(false)
@@ -182,7 +183,7 @@ function BookList(props) {
         { name: 'm_title',      title: 'TITLE' },
         { name: 'm_author',     title: 'AUTHOR' },
         { name: 'm_dept',     title: 'DEPARTMENT' },
-        { name: 'm_copies',     title: 'COPIES'},
+        { name: 'm_copies',     title: 'AVAILABLE COPIES'},
         { name: 'm_more_info',     title: ' '},
     ]);
 
@@ -222,6 +223,33 @@ function BookList(props) {
                 </Grid>
             </Container> 
             <BookListBorrowComp searchValue={searchRes} material_columns={columns}/>
+
+            <br/>
+
+            <Container fluid='true' className="head-search">
+                
+                <Grid className="hs">
+                    <Grid.Col span={5} className="welcome-msg">
+                        <h2 className="header-texts"><strong>RETURNED RECORDS</strong></h2>
+
+                    </Grid.Col>
+                    <Grid.Col span={7}>
+                    <Flex direction="row" gap="sm" align="center" justify="center" wrap="wrap">
+                        <form onSubmit={noRefresh} focused="true" target="_self">
+                            <Input hidden={true}
+                                style={{width:'500px'}}
+                                icon={<IconSearch hidden={true} size={25} />}
+                                placeholder="Search"
+                                radius="lg"
+                                className="input-edited"
+                                onChange={e => searchQ(e.target.value)}
+                            />
+                        </form>
+                        </Flex>
+                    </Grid.Col>
+                </Grid>
+            </Container> 
+            <TransactionsPatron activeEmail = {props.activePatronEmail}/>
         </div>
         </>
     );

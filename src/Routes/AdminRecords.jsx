@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef, useCallback} from "react";
 import '../Styles/Admin.css';
 
 import Paper from '@mui/material/Paper';
@@ -18,9 +18,23 @@ import {
   Toolbar,
   SearchPanel,
   TableColumnResizing,
+  ExportPanel,
 } from '@devexpress/dx-react-grid-material-ui';
+import { GridExporter } from '@devexpress/dx-react-grid-export';
+import saveAs from 'file-saver';
+function AdminRecords(props) {
+  const exporterRef = useRef(null);
 
-function AdminBorrowTable(props) {
+  const startExport = useCallback(() => {
+    exporterRef.current.exportGrid();
+  }, [exporterRef]);
+
+  const onSave = (workbook) => {
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'ReturnedRecords.xlsx');
+    });
+  };
+
     const tableP = {
         width: '80%',
         margin: '30px auto 20px auto',
@@ -35,8 +49,11 @@ function AdminBorrowTable(props) {
         {...restProps}
         style={{
         ...style,
+        fontSize: '14px',
         textAlign : 'center',
-        fontWeight : 'bold'
+        fontWeight : 'bold',
+        whiteSpace: 'normal',  
+          wordWrap: 'break-word',
         }}
       />
       );
@@ -99,14 +116,21 @@ function AdminBorrowTable(props) {
         <Table  cellComponent={Cell}/>
         <TableHeaderRow showSortingControls cellComponent={HeadStyle}/>
         <Toolbar />
+        <ExportPanel startExport={startExport} />
         
         <SearchPanel />
         <PagingPanel
             pageSizes={pSizes}
         />
         </Grid>
+        <GridExporter
+        ref={exporterRef}
+        rows={props.searchValue}
+        columns={props.admin_columns}
+        onSave={onSave}
+      />
     </Paper>
     </>
   );
 }
-export default AdminBorrowTable;
+export default AdminRecords;

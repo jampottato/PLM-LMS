@@ -40,66 +40,76 @@ function Login() {
 				localStorage.clear();
 				localStorage.setItem('name', result.user.displayName);
 				localStorage.setItem('email', result.user.email);
-
+				
 				console.log('GO BEFORE ANYTHING')
-				// For testing purposes, it is set to 0, set to 1 for production
-				if (containsNumbers(result.user.email) == 1 ){
-					const issueRef = collection(db, 'Issue')
-					const currentUser = query(issueRef, where('patron_email', '==', result.user.email), where('issue_status', '==', 'confirmed'))
-					
-					getDocs(currentUser)
-					.then( results => {
-						let dateToday = currentDate
-						results.docs.map((docH)=>{
-							//Count penalty if the days are in the same month
-							let times = Math.abs(dateToday.getDate() - docH.data().issue_due.toDate().getDate())
-							let counter = 0
-							let issueMonth = docH.data().issue_due.toDate().getMonth()+1
-							let issueDate = docH.data().issue_due.toDate().getDate()
-							let issueYear = docH.data().issue_due.toDate().getFullYear()
-							let issueDateFormat = issueMonth + '-' + issueDate + '-' + issueYear;
-		
-							let todayMonth = dateToday.getMonth()+1
-							let todayDate = dateToday.getDate()
-							let todayYear = dateToday.getFullYear()
-							let todayDateFormat = todayMonth + '-' + todayDate + '-' + todayYear;
-		
-							//Count penalty to check if the days are not in the same month
-							//  if it is not in the same month, the {times} will be changed in the value of {counter}
-							//  exampel: (April - March) = (4 - 3) = 1
-							if((todayMonth -  issueMonth) > 0) {
-		
-								//Iterate the issue due date until it is equal to today's date 
-								//  counting the number of days to penalize
-								while(issueDateFormat != todayDateFormat){
-									dateToday.setDate(dateToday.getDate() - 1)
-									todayMonth = dateToday.getMonth()+1
-									todayDate = dateToday.getDate()
-									todayYear = dateToday.getFullYear()
-									todayDateFormat = todayMonth + '-' + todayDate + '-' + todayYear;
-								   
-									counter+=1
-								}
-								times = counter
-							} 
-		
-							// Assign the penalty value calculated accdg. to the calculation above
-							if(docH.data().issue_due.toDate() < dateToday){
-								updateDoc(doc(db, "Issue", docH.id),{
-									issue_fine: times*parseInt(50)
-								})
-							} 
+				let userIsAdmin = false;
+				const currentUser = query(issueRef, where('patron_email', '==', result.user.email), where('isAdmin', '==', true))
+				getDocs(currentUser).then(results=>{
+					alert(results.size)
+					if(results.size > 0){
+						userIsAdmin = true;
+					}
+				}).then(()=>{
+					// For testing purposes, it is set to 0, set to 1 for production
+					if (containsNumbers(result.user.email) == 1 && userIsAdmin == false){
+						const issueRef = collection(db, 'Issue')
+						const currentUser = query(issueRef, where('patron_email', '==', result.user.email), where('issue_status', '==', 'confirmed'))
+						
+						getDocs(currentUser)
+						.then( results => {
+							let dateToday = currentDate
+							results.docs.map((docH)=>{
+								//Count penalty if the days are in the same month
+								let times = Math.abs(dateToday.getDate() - docH.data().issue_due.toDate().getDate())
+								let counter = 0
+								let issueMonth = docH.data().issue_due.toDate().getMonth()+1
+								let issueDate = docH.data().issue_due.toDate().getDate()
+								let issueYear = docH.data().issue_due.toDate().getFullYear()
+								let issueDateFormat = issueMonth + '-' + issueDate + '-' + issueYear;
+			
+								let todayMonth = dateToday.getMonth()+1
+								let todayDate = dateToday.getDate()
+								let todayYear = dateToday.getFullYear()
+								let todayDateFormat = todayMonth + '-' + todayDate + '-' + todayYear;
+			
+								//Count penalty to check if the days are not in the same month
+								//  if it is not in the same month, the {times} will be changed in the value of {counter}
+								//  exampel: (April - March) = (4 - 3) = 1
+								if((todayMonth -  issueMonth) > 0) {
+			
+									//Iterate the issue due date until it is equal to today's date 
+									//  counting the number of days to penalize
+									while(issueDateFormat != todayDateFormat){
+										dateToday.setDate(dateToday.getDate() - 1)
+										todayMonth = dateToday.getMonth()+1
+										todayDate = dateToday.getDate()
+										todayYear = dateToday.getFullYear()
+										todayDateFormat = todayMonth + '-' + todayDate + '-' + todayYear;
+									
+										counter+=1
+									}
+									times = counter
+								} 
+			
+								// Assign the penalty value calculated accdg. to the calculation above
+								if(docH.data().issue_due.toDate() < dateToday){
+									updateDoc(doc(db, "Issue", docH.id),{
+										issue_fine: times*parseInt(50)
+									})
+								} 
+							})
 						})
-					})
-					.then(()=>{
-						console.log('GO TO HOME')
-						navigate('/StdHome')
-					})
-					
-				} else {
-					console.log('GO TO ADMIN')
-					navigate('/Admin')
-				}
+						.then(()=>{
+							console.log('GO TO HOME')
+							navigate('/StdHome')
+						})
+						
+					} else {
+						console.log('GO TO ADMIN')
+						navigate('/@!')
+					}
+				})
+				
 				return result.user;
 				
 			})

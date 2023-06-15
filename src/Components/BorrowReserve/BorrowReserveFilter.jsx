@@ -108,6 +108,9 @@ function BorrowReserveFilter() {
                         
                     }  else {
                         console.log('TMP MAP - ',tmpMap)
+                        tmpMap.m_call_num = docH.data().m_call_num;
+                        tmpMap.m_dept =docH.data().m_dept;
+                        tmpMap.m_author = docH.data().m_author;
                         setBorrowingResult(prev => prev.concat(tmpMap))
                     }
                 })
@@ -117,7 +120,10 @@ function BorrowReserveFilter() {
     }, [activePatronEmail])
 
     const [columnsBorrowing] = useState([
+        {name : 'm_call_num',      title : 'CALL NUMBER'},
         {name : 'm_title',      title : 'TITLE'},
+        { name: 'm_author',     title: 'AUTHOR' },
+        { name: 'm_dept',       title: 'DEPARTMENT' },
         {name : 'issue_due',    title : 'DUE'},
         {name : 'issue_fine',   title : 'PENALTY'},
     ]);

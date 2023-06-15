@@ -19,9 +19,8 @@ import {
   SearchPanel,
   TableColumnResizing,
 } from '@devexpress/dx-react-grid-material-ui';
-import { Container } from "react-bootstrap";
 
-function AdminReserveTable(props) {
+function AdminRecords(props) {
     const tableP = {
         width: '80%',
         margin: '30px auto 20px auto',
@@ -45,58 +44,68 @@ function AdminReserveTable(props) {
       return <HeaderCell {...props}/>
     }
   
-    const HighlightedCell = ({ value, style, ...restProps }) => (
-      <Table.Cell
+    const HighlightedCell = ({ value, style, ...restProps }) => {
+      let val = value;
+      if(value == 0){
+        val = '0';
+      }
+      return (
+        <Table.Cell
         {...restProps}
         style={{
-        ...style,
-        whiteSpace: 'normal',  
+          ...style,
+          whiteSpace: 'normal',  
           wordWrap: 'break-word',
-        border: '1px solid rgba(0,0,0,0.1)',
-        textAlign : 'center'
+          border: '1px solid rgba(0,0,0,0.1)',
+          textAlign : 'center'
         }}
-      >
-        {value}
-      </Table.Cell>
-    );
+        >
+          {val}
+        </Table.Cell>
+      )
+    };
     
     const Cell = (props) => {
     return <HighlightedCell {...props} />;
     };
+
+
       const [currentPage, setCurrentPage] = useState(0);
       const [pSize, setPSize] = useState(5);
       const [pSizes] = useState([5, 10, 15]);
 
   return (
     <>
-      <Paper style={tableP} elevation={5} hidden={props.hide}>
+        <Paper style={tableP} elevation={5} hidden={props.hide}>
         <Grid
         rows={props.searchValue}
         columns={props.admin_columns}
         >
-          <SearchState defaultValue="" />
-          <IntegratedFiltering />
-          <PagingState
-              currentPage={currentPage}
-              onCurrentPageChange={setCurrentPage}
-              pageSize={pSize}
-              onPageSizeChange={setPSize}
-          />
-          <IntegratedPaging />
-          <SortingState
-            defaultSorting={[{ columnName: 'issue_checkout_date', direction: 'asc' }]}
-          />
-          <IntegratedSorting/>
-          <Table  cellComponent={Cell}/>
-          <TableHeaderRow showSortingControls cellComponent={HeadStyle}/>
-          <Toolbar />
-          <SearchPanel />
-          <PagingPanel
-              pageSizes={pSizes}
-          />
+        <SearchState defaultValue="" />
+        <IntegratedFiltering />
+        <PagingState
+            currentPage={currentPage}
+            onCurrentPageChange={setCurrentPage}
+            pageSize={pSize}
+            onPageSizeChange={setPSize}
+        />
+        
+        <IntegratedPaging />
+        <SortingState
+          defaultSorting={[{ columnName: 'issue_due', direction: 'asc' }]}
+        />
+        <IntegratedSorting/>
+        <Table  cellComponent={Cell}/>
+        <TableHeaderRow showSortingControls cellComponent={HeadStyle}/>
+        <Toolbar />
+        
+        <SearchPanel />
+        <PagingPanel
+            pageSizes={pSizes}
+        />
         </Grid>
-      </Paper>
+    </Paper>
     </>
   );
 }
-export default AdminReserveTable;
+export default AdminRecords;

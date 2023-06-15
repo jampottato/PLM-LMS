@@ -15,15 +15,19 @@ function add_all_records() {
     useEffect(()=>{
         let count = 0
         const appointGather = async () => {
-                newCollection.map( doc => {
-                    addDoc(materialRef, (
-                        doc
+            await newCollection.map( doc => {
+                doc.m_copies=1
+                console.log(doc.m)
+                addDoc(materialRef, (
+                    doc   
                     ))
                 })
             alert(count)
             count = 0
         }
-        appointGather()
+        appointGather().then(()=>{
+            alert('Done adding')
+        })
 
 
     }, [])

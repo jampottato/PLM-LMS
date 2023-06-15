@@ -17,6 +17,8 @@ import AdminBorrowTable from "./AdminBorrowTable";
 import { Fragment } from "react";
 import AdminAppointmentTable from "./AdminAppointmentTable";
 import AdminReserveTable from "./AdminReserveTable";
+import Transactions from "./Transactions";
+import CancelledTransactions from "./CancelledTransactions";
 
 function Admin() {
     const STATUS_ARR = ['not confirmed', 'confirmed', 'returned']
@@ -56,20 +58,14 @@ function Admin() {
     useEffect(()=>{
         const borrowed = async () => {
             await getDocs(colRefIssue).then( res => {
+                res.docs.map((doc)=>{
+                    console.log('HEREEEE : ', doc.data())
+                })
                 //ISSUE Entity
                 setIssueResult(
                     res.docs.map((doc)=>({
                         issue_id:           doc.id,
-                        issue_checkout_date:doc.data().issue_checkout_date,
-                        issue_due:          doc.data().issue_due,
-                        issue_borrowed:          doc.data().issue_borrowed,
-                        issue_fine:         doc.data().issue_fine,
-                        issue_status:       doc.data().issue_status,
-                        m_id:               doc.data().m_id,
-                        m_title:            doc.data().m_title,
-                        patron_email:       doc.data().patron_email,
-                        patron_id:          doc.data().patron_id,
-                        patron_name:        doc.data().patron_name,
+                        ...doc.data()
                     }))
                 )
             })
@@ -120,6 +116,7 @@ function Admin() {
             }
 
             issueResult.map(results =>{
+                results.return_date = currentDate
                 if(results.issue_id == issueID){
                     console.log('returnMaterial function', )
                     addDoc(collection(db, 'ReturnReports'), results)
@@ -140,6 +137,7 @@ function Admin() {
                 addDoc(collection(db, 'CancelledRecords'), {
                     issue_id: iid,
                     issue_cancel_reason: reason,
+                    cancel_date: currentDate,
                     position: 'admin',
                     record_type: 'cancelled confirmation to borrow',
                     ...res.data()
@@ -159,6 +157,7 @@ function Admin() {
                     issue_id: iid,
                     issue_cancel_reason: reason,
                     position: 'admin',
+                    cancel_date: currentDate,
                     record_type: 'cancelled the patron reservation',
                     ...res.data()
                 })
@@ -254,9 +253,9 @@ function Admin() {
                 let res = {}
                 const specificMat = getDoc(doc(db, "Material", idd.m_id)) 
                 const dateReserved = idd.issue_checkout_date.toDate().toLocaleDateString('en-US') + " " + idd.issue_checkout_date.toDate().toLocaleTimeString('en-US')
-                let dateBorrowed;
+                
                 res.issue_checkout_date = dateReserved
-                dateBorrowed = idd.issue_borrowed.toDate().toLocaleDateString('en-US') + " " + idd.issue_borrowed.toDate().toLocaleTimeString('en-US')
+                let dateBorrowed = idd.issue_borrowed.toDate().toLocaleDateString('en-US') + " " + idd.issue_borrowed.toDate().toLocaleTimeString('en-US')
                 res.issue_borrowed = dateBorrowed
                 
                 if(idd.issue_status == 'confirmed'){
@@ -437,8 +436,61 @@ function Admin() {
             </Grid>
         </Container>
 
+
+        <Container fluid='true' className="head-search" hidden={hiddRese}>
+            <Grid className="hs">
+                <Grid.Col span={5} className="welcome-msg">
+                    <h2 className=""><strong>RESERVED</strong></h2>
+
+                </Grid.Col>
+                <Grid.Col span={7}>
+                </Grid.Col>
+            </Grid>
+        </Container> 
         <AdminReserveTable      hide={hiddRese} searchValue={searchRes} admin_columns={columnsReserve}/>
-        <AdminBorrowTable       hide={hiddRese} searchValue={specificResultC} admin_columns={columnsBorrow}/>
+
+        <br/>
+
+        <Container fluid='true' className="head-search" hidden={hiddRese}>
+            <Grid className="hs">
+                <Grid.Col span={5} className="welcome-msg">
+                    <h2 className=""><strong>BORROWED</strong></h2>
+
+                </Grid.Col>
+                <Grid.Col span={7}>
+                </Grid.Col>
+            </Grid>
+        </Container> 
+        <AdminBorrowTable hide={hiddRese} searchValue={specificResultC} admin_columns={columnsBorrow}/>
+
+        <br/>
+
+        <Container fluid='true' className="head-search" hidden={hiddRese}>
+            <Grid className="hs">
+                <Grid.Col span={5} className="welcome-msg">
+                    <h2 className=""><strong>RETURNED RECORDS</strong></h2>
+
+                </Grid.Col>
+                <Grid.Col span={7}>
+                </Grid.Col>
+            </Grid>
+        </Container> 
+        <Transactions hide={hiddRese} />
+
+        <br/>
+
+        <Container fluid='true' className="head-search" hidden={hiddRese}>
+            <Grid className="hs">
+                <Grid.Col span={5} className="welcome-msg">
+                    <h2 className=""><strong>CANCELLED RECORDS</strong></h2>
+
+                </Grid.Col>
+                <Grid.Col span={7}>
+                </Grid.Col>
+            </Grid>
+        </Container> 
+        <CancelledTransactions hide={hiddRese} />
+
         <AdminAppointmentTable  hide={hiddAppt}/>
 
     <Footer/>

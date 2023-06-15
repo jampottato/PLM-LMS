@@ -6,6 +6,7 @@ import {Link} from "react-router-dom";
 
 import {BsHouseDoorFill, BsFillFileTextFill, BsBookHalf, BsFillPlayBtnFill } from "react-icons/bs";
 import Logout from './Logout';
+import Patron from './Patron';
 
 function StdNav() {
   return (
@@ -23,7 +24,7 @@ function StdNav() {
     </Navbar.Brand>
       <Nav className='FunctionNav'>
         <Link to = "/StdHome" className='home'><BsHouseDoorFill/>  Home</Link>
-        <Link to = '/Appointment' className='appointment'><BsFillFileTextFill/> Appointment</Link>
+        <Link to = '/Patron' className='appointment'><BsFillFileTextFill/> Appointment</Link>
         <Logout/>
       </Nav>
       

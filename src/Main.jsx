@@ -13,7 +13,8 @@ import AdminBorrowTable from "./Routes/AdminBorrowTable";
 import SetAllCopies from "./Routes/set_all_copies";
 import AddAllMat from "./Routes/add_all_records";
 import AddMaterial from "./Components/AddMaterial";
-
+import Transactions from "./Routes/Transactions.jsx";
+import Patron from './Components/Patron'
 function Main() {
   return (
    <Router>
@@ -31,6 +32,8 @@ function Main() {
       {/* <Route path="/ftest" element={<FTest/>}/>
       <Route path="/adbtest" element={<AdminBorrowTable/>}/> */}
       <Route path="/sets" element={<SetAllCopies/>}/>
+      <Route path="/transact" element={<Transactions/>}/>
+      <Route path="/Patron" element={<Patron/>}/>
       {/* <Route path="/adds" element={<AddAllMat/>}/> */}
     </Routes>
    </Router>

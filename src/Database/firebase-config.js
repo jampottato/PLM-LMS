@@ -8,6 +8,20 @@ import {
 } from "firebase/auth";
 
 const firebaseConfig = {
+  // apiKey: "AIzaSyB6yCoYZzyuLDzI8pbHtFBQvIDQzAIa1pc",
+
+  // authDomain: "plms-backup.firebaseapp.com",
+
+  // projectId: "plms-backup",
+
+  // storageBucket: "plms-backup.appspot.com",
+
+  // messagingSenderId: "177957918050",
+
+  // appId: "1:177957918050:web:88471749300f12b6c1483b"
+
+
+   //------------------------------------------
   apiKey: "AIzaSyAJCPQ5tIkQXnxlXlDiKBaMFanmnhMzmTU",
 
   authDomain: "se-lms-tk.firebaseapp.com",
@@ -21,6 +35,8 @@ const firebaseConfig = {
   appId: "1:756504720193:web:4dea4935e9b1aa09f367c0",
 
   measurementId: "G-W85R65CL61"
+
+  //------------------------------------------
 
   // apiKey: "AIzaSyAZgU0sOBHjzwsfeDR_lfRmigy9Jtw-ADY",
 
@@ -58,3 +74,6 @@ export const logOut = () => {
 // 36460649-7ffd-4d7d-b4e8-77a151768180
 
 // Et08Q~Ka4GIPzc2sXIDpmypnZPPZO4sNyBVxVdta
+
+// b74fd2a7-7560-425b-a135-19687a7f325f
+// yTy8Q~7VEc6eNfC.61jScs6YphvGxeQuNNdhJbge
