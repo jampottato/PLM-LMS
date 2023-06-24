@@ -106,8 +106,18 @@ function StdHome() {
 
 	useEffect(()=>{
 		const issueRef = collection(db, 'Issue')
+		
 		const currentUser = query(issueRef, where('patron_email', '==', activePatronEmail), where('issue_status', '==', 'confirmed'))
 		
+		// getDocs(isAdmin).then(results=>{
+		// 	if(results.size > 0){
+		// 		console.log('GO TO HOME')
+
+		// 		navigate('/@!')
+		// 		return;
+		// 	}
+		// })
+
 		getDocs(currentUser)
 		.then( results => {
 			let dateToday = currentDate
@@ -153,6 +163,7 @@ function StdHome() {
 			})
 		})
 		.then(()=>{
+			// alert('HOME HERE')
 			console.log('GO TO HOME')
 			navigate('/StdHome')
 		})
@@ -228,6 +239,7 @@ function StdHome() {
 			// Add the user entered data
 			await addDoc(collection(db,"UserData"), {
 				college:college,
+				isAdmin:false,
 				patron_email:activePatronEmail,
 				patron_name:name,
 				program:program,

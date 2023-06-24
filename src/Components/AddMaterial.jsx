@@ -33,28 +33,31 @@ function AddMaterial() {
     //Add Doc to students
     // Add a new document in collection "Student"
     const AddMaterial = async () => {
-        if (isEqual == false) {
-        //check if the added stuff is existing
-        console.log("ISEQUAL: ", isEqual)
-        await addDoc(collection(db, "Material"), {
-
-            m_author:   m_author ,
-            m_call_num: m_call_num,
-            m_copies:   m_copies,
-            m_copyright: m_copyright,
-            m_dept: m_dept,
-            m_edition: m_edition,
-            m_isbn: m_isbn,
-            m_lccn: m_lccn,
-            m_pages: m_pages,
-            m_pub: m_pub,
-            m_pub_date: m_pub_date,
-            m_title: m_title,
-            m_type: m_type,
-               
-        }).then(()=>{
-            setIsModalOpen(true);
-        })
+        if(confirm('Are you sure you want to add this book?')){
+            if (isEqual == false) {
+                //check if the added stuff is existing
+                console.log("ISEQUAL: ", isEqual)
+                await addDoc(collection(db, "Material"), {
+        
+                    m_author:   m_author ,
+                    m_call_num: m_call_num,
+                    m_copies:   m_copies,
+                    m_copyright: m_copyright,
+                    m_dept: m_dept,
+                    m_edition: m_edition,
+                    m_isbn: m_isbn,
+                    m_lccn: m_lccn,
+                    m_pages: m_pages,
+                    m_pub: m_pub,
+                    m_pub_date: m_pub_date,
+                    m_title: m_title,
+                    m_type: m_type,
+                       
+                }).then(()=>{
+                    setIsModalOpen(true);
+                })
+        }
+        
         
     }};
 
@@ -191,7 +194,6 @@ function AddMaterial() {
                             Material successfully added!
                         </Typography>
                         <Typography id="material-added-modal-description">
-                            {/* Additional information or instructions */}
                         </Typography>
                         </Box>
                     </Modal>

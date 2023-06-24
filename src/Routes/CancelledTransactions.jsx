@@ -21,12 +21,8 @@ import AdminRecords from "./AdminRecords";
 import CancelledComp from "./CancelledComp";
 
 function CancelledTransactions(props) {
-    const activeEmail = 'apalingad2020@plm.edu.ph'
-    const [returnsResP, setReturnsResultP] = useState([])
     const [returnsResA, setReturnsResultA] = useState([])
     const [showRes, setShowRes] = useState([])
-
-
 
     const [columnsBorrow] = useState([
         { name: 'cancel_date',          title: 'DATE CANCELLED' },

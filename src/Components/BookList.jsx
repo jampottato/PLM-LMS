@@ -16,30 +16,22 @@ import TransactionsPatron from "./TransactionsPatron";
 function BookList(props) {
     const [opened, { open, close }] = useDisclosure(false)
 
-    // Get these email, name, and idNumber for us to identify who is going to reserve some books 
-    let activePatronEmail   =   props.activePatronEmail;          // They are in a localStorage because we want to get the
-    let activePatronName    =   props.name;                       // current LOGGED IN user (available info only are those)
-    let activeIDN           =   props.activePID;                  // Patron ID is provided when the user has already entered data
-                                                                  // and it is retrieved from UserData collection as props in this BookList
+    let activePatronEmail   =   props.activePatronEmail;         
+    let activePatronName    =   props.name;                       
+    let activeIDN           =   props.activePID;                  
 
-    //DB REFERENCES
     const colRefMaterial = collection(db, "Material")
 
-    //MATERIAL DETAILS
-    const [searchRes, setSearchRes] = useState([])              // It is the result {} for the searched value
-    const [materialResult, setMaterialResult] = useState([])    // The result for the Materials collection
+    const [searchRes, setSearchRes] = useState([])             
+    const [materialResult, setMaterialResult] = useState([])   
     
-    //SEARCH VALUE
-    const [searchVal, setSearchVal] = useState(props.college) // The default search value is the department of the patron
+    const [searchVal, setSearchVal] = useState(props.college) 
     
-
-    // Disable the borrow button when the copies of book are 0 
     const disableWhenZero = (val) => {
         return val > 0 ? false : true
     }
 
-    //PATRONS' Reserve Function (reserve button)
-    const getInfo = async (bId, title) => { // bId = Material ID that the patron borrowed
+    const getInfo = async (bId, title) => { 
         if(confirm("Are you sure you want to reserve '" + title + "'?")){
             const borrowedMaterials = query(collection(db, 'Issue'), where('patron_email', '==', activePatronEmail))
             let count = 0;
@@ -49,17 +41,15 @@ function BookList(props) {
                 })
             })
             if(count >= 3){
-                alert('You have reached the maximum number of transactions')
+                alert('You have reached the maximum number of 3 transactions')
                 return
             }
 
             let copies = 0
             let dateToday = new Date()
             let dateDue = new Date()
-            dateDue.setDate(dateToday.getDate()+2) //+2 means that the borrow days should be max of 2 days only
+            dateDue.setDate(dateToday.getDate()+2) 
 
-            //Get current copies from Material collection 
-            // so that you will know what value to decrease 
             let materialDetails;
             await getDoc(doc(db, "Material", bId)).then((doc)=> {
                 copies = doc.data().m_copies;
@@ -72,12 +62,6 @@ function BookList(props) {
                 //Check if there is a patron ID
                 console.log('You have reserved a book. Come to the library to borrow the material.', activeIDN)
                 if(!(activeIDN == null || activeIDN == '')){
-                    //When the patron has confirmed, specified material data must decrease to 1
-                    // await updateDoc(doc(db, "Material", bId), {
-                    //     m_copies: (copies-1)
-                    // })
-
-                    // Add the necessary fields to Issue entity when patron confirmed to borrow a book
                     await addDoc(collection(db, "Issue"), {
                         patron_id : activeIDN,
                         m_id : bId,
@@ -85,9 +69,9 @@ function BookList(props) {
                         patron_email : activePatronEmail,
                         issue_borrowed : dateToday,
                         issue_status : 'not confirmed',
-                        issue_checkout_date : dateToday, //today
-                        issue_due : dateDue, // 2days after
-                        issue_fine : 0, // 0,
+                        issue_checkout_date : dateToday, 
+                        issue_due : dateDue,
+                        issue_fine : 0,
                         ...materialDetails
                     }).then(
                         ()=>{
@@ -101,27 +85,23 @@ function BookList(props) {
                 }
             } 
             else {
-                // TODO: Change this with a modal
                 alert("There are 0 copies, you could not borrow this")
             }
         }
     }
 
-    // Reserve BTN
     const reserveBtn = (mid, mtitle, mcopies) => {
         return (
             <Button style={{display:"inline-block",margin:0,padding:"0 30px 0 30px",maxWidth:'100%'}} onClick={() => getInfo(mid, mtitle)} disabled={disableWhenZero(mcopies)}>RESERVE</Button>
         )
     }
 
-    // More details BTN
     const moreInfo = (title, author, dept, pubYear, copies) => {
         return (
             <MoreInfo title={title} author={author} department={dept} pubYear={pubYear} copies={copies}/>
         )
     }
 
-    // Generate the Materials list
     useEffect(()=>{
         const getAllMaterials = async ()=>{
             await getDocs(colRefMaterial).then( (qSnapshot)=>{
@@ -149,8 +129,6 @@ function BookList(props) {
         getAllMaterials()
     },[props.activePID])
 
-    // It serves as the initiator for the contents of the books in the patron landing page after log in
-    // It initiates the SEARCH VALUE into the department they are currently in
     useEffect(()=>{
         const filteredSearch = materialResult.filter((item)=>{
             let dept;
@@ -165,17 +143,6 @@ function BookList(props) {
     useEffect(()=>{
         console.log('SEARCHRES\t', searchRes)
     },[searchRes])
-
-    // Get the Material details in order to initiate a search
-    // const searchQ = (val) => {
-    //     setSearchVal(val)
-    //     console.log('item ', materialResult)
-    //     const filteredSearch = materialResult.filter((item)=>{
-
-    //         return  item.m_title.includes(val) || item.m_author.includes(val)
-    //     })
-    //     setSearchRes(filteredSearch)
-    // }
 
     const [columns] = useState([
         { name: 'm_btn',        title: ' ' },
@@ -202,7 +169,7 @@ function BookList(props) {
             <Container fluid='true' className="head-search">
                 <Grid className="hs">
                     <Grid.Col span={7}>
-                        <h1>Welcome {props.name}</h1> 
+                        <h1>Welcome! {props.name}</h1> 
                         <h3>{props.activePatronEmail}</h3>
                         <br/><br/>
                     </Grid.Col>

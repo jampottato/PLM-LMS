@@ -10,7 +10,6 @@ function Login() {
 	
 	const [currentDate, setCurrentDate] = useState()
 
-    // Fetch the Universal Time to det the date and time to only one source and sync 
     useEffect(() => {
         fetch("https://www.worldtimeapi.org/api/timezone/Asia/Manila.json").then( res => {
             res.text().then( val => {
@@ -23,7 +22,7 @@ function Login() {
     },[])
 
 	useEffect(()=>{
-		console.log('currentDate - - ',currentDate)
+		// console.log('currentDate - - ',currentDate)
 	},[currentDate])
 
 	function containsNumbers(str) {
@@ -34,8 +33,6 @@ function Login() {
 	const login = async () => {
 		await signInWithMicrosoft()
 			.then((result) =>{ 
-				// add the data of the logged in account in USERDATA
-				// notify the home that the active account is the user logged in
 
 				localStorage.clear();
 				localStorage.setItem('name', result.user.displayName);
@@ -43,14 +40,14 @@ function Login() {
 				
 				console.log('GO BEFORE ANYTHING')
 				let userIsAdmin = false;
-				const currentUser = query(issueRef, where('patron_email', '==', result.user.email), where('isAdmin', '==', true))
+				const currentUser = query(collection(db, 'UserData'), where('patron_email', '==', result.user.email), where('isAdmin', '==', true))
 				getDocs(currentUser).then(results=>{
-					alert(results.size)
+					// alert(results.size)
 					if(results.size > 0){
 						userIsAdmin = true;
+						console.log('GO TO ADMIN')
 					}
 				}).then(()=>{
-					// For testing purposes, it is set to 0, set to 1 for production
 					if (containsNumbers(result.user.email) == 1 && userIsAdmin == false){
 						const issueRef = collection(db, 'Issue')
 						const currentUser = query(issueRef, where('patron_email', '==', result.user.email), where('issue_status', '==', 'confirmed'))
@@ -59,7 +56,6 @@ function Login() {
 						.then( results => {
 							let dateToday = currentDate
 							results.docs.map((docH)=>{
-								//Count penalty if the days are in the same month
 								let times = Math.abs(dateToday.getDate() - docH.data().issue_due.toDate().getDate())
 								let counter = 0
 								let issueMonth = docH.data().issue_due.toDate().getMonth()+1
@@ -72,13 +68,8 @@ function Login() {
 								let todayYear = dateToday.getFullYear()
 								let todayDateFormat = todayMonth + '-' + todayDate + '-' + todayYear;
 			
-								//Count penalty to check if the days are not in the same month
-								//  if it is not in the same month, the {times} will be changed in the value of {counter}
-								//  exampel: (April - March) = (4 - 3) = 1
 								if((todayMonth -  issueMonth) > 0) {
 			
-									//Iterate the issue due date until it is equal to today's date 
-									//  counting the number of days to penalize
 									while(issueDateFormat != todayDateFormat){
 										dateToday.setDate(dateToday.getDate() - 1)
 										todayMonth = dateToday.getMonth()+1
@@ -90,8 +81,6 @@ function Login() {
 									}
 									times = counter
 								} 
-			
-								// Assign the penalty value calculated accdg. to the calculation above
 								if(docH.data().issue_due.toDate() < dateToday){
 									updateDoc(doc(db, "Issue", docH.id),{
 										issue_fine: times*parseInt(50)
@@ -107,16 +96,13 @@ function Login() {
 					} else {
 						console.log('GO TO ADMIN')
 						navigate('/@!')
+						return
 					}
 				})
 				
 				return result.user;
 				
 			})
-			// .then((v)=>{alert(v.email)})
-			.catch((error) => {
-				// alert(error.message);
-			});
 	};
 
 	return (

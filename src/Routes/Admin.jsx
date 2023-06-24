@@ -397,9 +397,15 @@ function Admin() {
         <AdminNav/>
 
         <Container fluid='true' className="head-search">
+            {/* <Grid className="hs" grow>
+                <Grid.Col span={4}>
+                    <h1><strong>Welcome to the Admin side!</strong></h1>
+                </Grid.Col>
+            </Grid> */}
             
             <Grid className="hs" grow>
-                <Grid.Col span={4}></Grid.Col>
+                <Grid.Col span={4}>
+                </Grid.Col>
 
                 <Grid.Col span={4} className="welcome-msg">
                     <Fragment >
@@ -408,31 +414,9 @@ function Admin() {
                     <span className="header-texts" ><Button style={{margin: '10px', padding:'5px'}} color="blue" onClick={apptABT}>Appointment</Button></span>
                     </Fragment>
                 </Grid.Col>
-
-                {/* NOT SHOWN */}
-                <Grid.Col span={4} className="search-box">
-                
-                    <Flex direction="row" gap="sm" align="center" justify="center" wrap="wrap">
-                    <form onSubmit={noRefresh} focused="true" target="_self">
-                        <Input
-                            //If you want manual search algo uncomment 2 lines below - DONT, may bug pa...If the reserved books list is hidden, then it should be too
-                            // hidden={hiddRese}
-                            // icon={<IconSearch size={25} hidden={hiddRese}/>}
-                            hidden={true}
-                            icon={<IconSearch size={25} hidden={true}/>}
-                            placeholder="Search"
-                            radius="lg"
-                            className="input-edited"
-                            onChange={e => searchQ(e.target.value)}
-                            style={{marginTop:'10px'}}
-                        />
-                        <Button type="submit" onClick={searchQ} size="xs" radius="xl" hidden="true">
-                            Search
-                        </Button>
-                    </form>
-                    </Flex>
+                <Grid.Col span={4}>
                 </Grid.Col>
-                {/* UNTIL HERE - NOT SHOWN */}
+
             </Grid>
         </Container>
 
