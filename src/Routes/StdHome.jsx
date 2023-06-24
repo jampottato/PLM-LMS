@@ -106,17 +106,17 @@ function StdHome() {
 
 	useEffect(()=>{
 		const issueRef = collection(db, 'Issue')
-		
+		const isAdmin = query(collection(db, 'UserData'), where('patron_email', '==', activePatronEmail), where('isAdmin', '==', true))
 		const currentUser = query(issueRef, where('patron_email', '==', activePatronEmail), where('issue_status', '==', 'confirmed'))
 		
-		// getDocs(isAdmin).then(results=>{
-		// 	if(results.size > 0){
-		// 		console.log('GO TO HOME')
+		getDocs(isAdmin).then(results=>{
+			if(results.size > 0){
+				console.log('GO TO HOME')
 
-		// 		navigate('/@!')
-		// 		return;
-		// 	}
-		// })
+				navigate('/@!')
+				return;
+			}
+		})
 
 		getDocs(currentUser)
 		.then( results => {
@@ -167,6 +167,7 @@ function StdHome() {
 			console.log('GO TO HOME')
 			navigate('/StdHome')
 		})
+		
 	},[activePatronEmail])
 
 	useEffect(()=>{

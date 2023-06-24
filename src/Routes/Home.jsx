@@ -12,19 +12,37 @@ import logo from '../assets/logo.png';
 import fire from  '../assets/fire.jpg';;
 import { auth } from '../Database/firebase-config';
 import { useEffect } from 'react';
-
+import { collection, getDocs, query, updateDoc, where, doc } from "firebase/firestore";
+import {db} from "../Database/firebase-config";
 
 function Header() {
   const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(true)
 
   useEffect(()=>{
-    auth.onAuthStateChanged(user => {
-      if(user != null) {
-        navigate('/StdHome')
-      } else {
+    auth.onAuthStateChanged(auser => {
+      if(auser == null){
         setShowLogin(false)
+      } else {
+        const isAdmin = query(collection(db, 'UserData'), where('patron_email', '==', auser.user.email), where('isAdmin', '==', true))
+        
+        getDocs(isAdmin).then(results=>{
+          try{
+            if(results.size > 0 && auser != null){
+              navigate('@!')
+            } else if(results.size < 1 && auser != null) {
+              navigate('/StdHome')
+            } else {
+              setShowLogin(false)
+            }
+          } catch (e) {
+            console.log('error ',e)
+          }
+          
+          return results
+        })
       }
+      
     })
   })
   

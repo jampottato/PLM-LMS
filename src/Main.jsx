@@ -24,10 +24,11 @@ function Main() {
       <Route path="/Appointment" element={<Appointment/>}/>
       <Route path="/Tutorial" element={<Tutorial/>}/>
       <Route path="/StdNav" element={<StdNav/>}/>
+      <Route path="/@!" element={<Admin/>}/>
       <Route path="/StdHome" element={<StdHome/>}/>
       <Route path="/Homevs" element={<Homevs/>}/>
       <Route path="/EnterInfo" element={<EnterInfo/>}/>
-      <Route path="/@!" element={<Admin/>}/>
+      
       <Route path="/AddMaterial" element={<AddMaterial/>}/>
       {/* <Route path="/ftest" element={<FTest/>}/>
       <Route path="/adbtest" element={<AdminBorrowTable/>}/> */}

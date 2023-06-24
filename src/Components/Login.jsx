@@ -42,13 +42,18 @@ function Login() {
 				let userIsAdmin = false;
 				const currentUser = query(collection(db, 'UserData'), where('patron_email', '==', result.user.email), where('isAdmin', '==', true))
 				getDocs(currentUser).then(results=>{
-					// alert(results.size)
+					alert(results.size)
 					if(results.size > 0){
+						
 						userIsAdmin = true;
 						console.log('GO TO ADMIN')
 					}
-				}).then(()=>{
-					if (containsNumbers(result.user.email) == 1 && userIsAdmin == false){
+					return results
+				}).then(res=>{
+					alert('SIZE')
+					
+					if (containsNumbers(result.user.email) == 1 && res.size < 1){
+						alert(res.size < 1)
 						const issueRef = collection(db, 'Issue')
 						const currentUser = query(issueRef, where('patron_email', '==', result.user.email), where('issue_status', '==', 'confirmed'))
 						
@@ -89,6 +94,7 @@ function Login() {
 							})
 						})
 						.then(()=>{
+							alert('RETURNS HERE')
 							console.log('GO TO HOME')
 							navigate('/StdHome')
 						})
@@ -96,17 +102,15 @@ function Login() {
 					} else {
 						console.log('GO TO ADMIN')
 						navigate('/@!')
-						return
 					}
 				})
 				
-				return result.user;
 				
 			})
 	};
 
 	return (
-			<Button onClick={login} variant="dark">Login with Microsoft</Button>
+			<Button onClick={() => login()} variant="dark">Login with Microsoft</Button>
 	);
 }
 	
