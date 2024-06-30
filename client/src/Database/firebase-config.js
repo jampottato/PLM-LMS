@@ -8,13 +8,13 @@ import {
 } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAJCPQ5tIkQXnxlXlDiKBaMFanmnhMzmTU",
-  authDomain: "se-lms-tk.firebaseapp.com",
-  projectId: "se-lms-tk",
-  storageBucket: "se-lms-tk.appspot.com",
-  messagingSenderId: "756504720193",
-  appId: "1:756504720193:web:b7e26f0c10f979eaf367c0",
-  measurementId: "G-Z2D2C1WLC3",
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: "",
+  measurementId: "",
 };
 
 const app = initializeApp(firebaseConfig);
